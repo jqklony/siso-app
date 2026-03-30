@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrainCircuit, ClipboardList, Cloud, Download, FileCheck, FileSignature, HardDrive, Lock, LogOut, MessageSquare, Printer, Save, Unlock, UploadCloud, Wifi, WifiOff } from "lucide-react";
 // ============================================================
 // Navbar.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

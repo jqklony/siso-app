@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-  CheckCircle2, AlertTriangle, RefreshCw, Lock
-} from 'lucide-react';
+  AlertCircle, AlertTriangle, Cloud, FileCheck, HardDrive,
+  Lock, Printer, RefreshCw, Save
+} from "lucide-react";
 // ─── AppComponents: all utilities + sub-components ──────────────────────────
 import {
   _ls, _ss, _SB_URL, _SB_KEY, _sync, _patKey,
