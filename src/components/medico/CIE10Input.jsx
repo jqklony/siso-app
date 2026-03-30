@@ -78,14 +78,14 @@ export const _buscarCUPS = (query, maxResults) => {
   ).slice(0, max);
 };
 export const CUPSInput = ({ value, onChange, placeholder, className }) => {
-  const [query, setQuery] = React.useState(value || "");
-  const [sugerencias, setSugerencias] = React.useState([]);
-  const [abierto, setAbierto] = React.useState(false);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
+  const [query, setQuery] = useState(value || "");
+  const [sugerencias, setSugerencias] = useState([]);
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
     setQuery(value || "");
   }, [value]);
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
     };
@@ -237,14 +237,14 @@ export const _buscarCIE10 = (query, maxResults) => {
 };
 // Componente CIE10Input: autocomplete en tiempo real al escribir
 export const CIE10Input = ({ value, onChange, placeholder, className, name }) => {
-  const [query, setQuery] = React.useState(value || "");
-  const [sugerencias, setSugerencias] = React.useState([]);
-  const [abierto, setAbierto] = React.useState(false);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
+  const [query, setQuery] = useState(value || "");
+  const [sugerencias, setSugerencias] = useState([]);
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
     setQuery(value || "");
   }, [value]);
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
     };

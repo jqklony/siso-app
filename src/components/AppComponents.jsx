@@ -6371,14 +6371,14 @@ const _buscarCUPS = (query, maxResults) => {
   ).slice(0, max);
 };
 export const CUPSInput = ({ value, onChange, placeholder, className }) => {
-  const [query, setQuery] = React.useState(value || "");
-  const [sugerencias, setSugerencias] = React.useState([]);
-  const [abierto, setAbierto] = React.useState(false);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
+  const [query, setQuery] = useState(value || "");
+  const [sugerencias, setSugerencias] = useState([]);
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
     setQuery(value || "");
   }, [value]);
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
     };
@@ -6936,14 +6936,14 @@ const _buscarCIE10 = (query, maxResults) => {
 };
 // Componente CIE10Input: autocomplete en tiempo real al escribir
 export const CIE10Input = ({ value, onChange, placeholder, className, name }) => {
-  const [query, setQuery] = React.useState(value || "");
-  const [sugerencias, setSugerencias] = React.useState([]);
-  const [abierto, setAbierto] = React.useState(false);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
+  const [query, setQuery] = useState(value || "");
+  const [sugerencias, setSugerencias] = useState([]);
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
     setQuery(value || "");
   }, [value]);
-  React.useEffect(() => {
+  useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
     };
@@ -8088,10 +8088,10 @@ export const LicenciasTab = ({
     );
   }
 
-  const [licEditId, setLicEditId] = React.useState(null);
-  const [licForm, setLicForm] = React.useState({});
-  const [licSaved, setLicSaved] = React.useState(false);
-  const [licErrors, setLicErrors] = React.useState([]); // validación método de pago
+  const [licEditId, setLicEditId] = useState(null);
+  const [licForm, setLicForm] = useState({});
+  const [licSaved, setLicSaved] = useState(false);
+  const [licErrors, setLicErrors] = useState([]); // validación método de pago
 
   const planOrder = ["libre", "starter", "pro", "clinica"];
   const planColors = {
@@ -8102,7 +8102,7 @@ export const LicenciasTab = ({
   };
 
   // ── Auto-apertura cuando viene de "Activar para usuario" en renderPlanes ──
-  React.useEffect(() => {
+  useEffect(() => {
     if (!pendingActivationPlan) return;
     // Abrir el primer usuario que no sea el admin activo, o el primero de la lista
     const target =
@@ -9619,12 +9619,12 @@ export const TabFormulaDerivacion = ({
   activeSignature,
   forceTab,
 }) => {
-  const [activeSubTab, setActiveSubTab] = React.useState(forceTab || "formula");
+  const [activeSubTab, setActiveSubTab] = useState(forceTab || "formula");
   // When forceTab changes (switching between separate tabs), update active sub-tab
-  React.useEffect(() => {
+  useEffect(() => {
     if (forceTab) setActiveSubTab(forceTab);
   }, [forceTab]);
-  const [newMed, setNewMed] = React.useState({
+  const [newMed, setNewMed] = useState({
     nombre: "",
     presentacion: "",
     dosis: "",
@@ -9632,16 +9632,16 @@ export const TabFormulaDerivacion = ({
     duracion: "",
     indicaciones: "",
   });
-  const [newDeriv, setNewDeriv] = React.useState({
+  const [newDeriv, setNewDeriv] = useState({
     especialidad: "",
     motivo: "",
     urgencia: "Electiva",
     observaciones: "",
   });
-  const [derivSearch, setDerivSearch] = React.useState("");
-  const [showDerivSugg, setShowDerivSugg] = React.useState(false);
-  const derivRef = React.useRef(null);
-  React.useEffect(() => {
+  const [derivSearch, setDerivSearch] = useState("");
+  const [showDerivSugg, setShowDerivSugg] = useState(false);
+  const derivRef = useRef(null);
+  useEffect(() => {
     const h = (e) => {
       if (derivRef.current && !derivRef.current.contains(e.target))
         setShowDerivSugg(false);
@@ -10845,7 +10845,7 @@ export function LoginForm({ onLogin, blockedUntil, attempts }) {
   const [p, setP] = useState("");
   const [remaining, setRemaining] = useState(0);
   // SEGURIDAD: countdown del bloqueo
-  React.useEffect(() => {
+  useEffect(() => {
     if (!blockedUntil) {
       setRemaining(0);
       return;
@@ -11692,13 +11692,13 @@ const PORTAL_URL = "https://fw5fnt.csb.app/#portaltrabajador";
 // ══════════════════════════════════════════════════════════════════════════
 export const PortalPublicoTrabajador = ({ sbUrl, sbKey, onVolver }) => {
   const { useState, useCallback, useRef } = React;
-  const [busqueda, setBusqueda] = React.useState("");
-  const [tipoBusqueda, setTipoBusqueda] = React.useState("codigo");
-  const [resultado, setResultado] = React.useState(null);
-  const [error, setError] = React.useState("");
-  const [cargando, setCargando] = React.useState(false);
-  const [intentos, setIntentos] = React.useState(0);
-  const [bloqueadoHasta, setBloqueadoHasta] = React.useState(0);
+  const [busqueda, setBusqueda] = useState("");
+  const [tipoBusqueda, setTipoBusqueda] = useState("codigo");
+  const [resultado, setResultado] = useState(null);
+  const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(false);
+  const [intentos, setIntentos] = useState(0);
+  const [bloqueadoHasta, setBloqueadoHasta] = useState(0);
   const MAX_INTENTOS = 6;
   const BLOQUEO_MS = 5 * 60 * 1000; // 5 minutos
 

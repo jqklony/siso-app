@@ -1,3 +1,4 @@
+import React from 'react';
 // ============================================================
 // MensajesOverlay.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

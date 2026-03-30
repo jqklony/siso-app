@@ -1,3 +1,4 @@
+import React from 'react';
 // ============================================================
 // HistoriaWrapper.jsx — Contenedor para vista de Historia Clínica
 // Maneja los tabs: ocupacional, general, certificado, etc.

@@ -49,7 +49,7 @@ export const _ss = {
   },
 };
 // Helper global - accesible desde cualquier función incluyendo goTo
-const sp = (k, fb) => {
+export const sp = (k, fb) => {
   const s = _ls.getItem(k);
   if (!s) return fb;
   try {
@@ -58,7 +58,7 @@ const sp = (k, fb) => {
     return fb;
   }
 };
-const sps = (k, fb) => {
+export const sps = (k, fb) => {
   const s = _ss.getItem(k);
   if (!s) return fb;
   try {

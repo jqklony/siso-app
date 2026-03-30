@@ -159,12 +159,12 @@ export const TabFormulaDerivacion = ({
   activeSignature,
   forceTab,
 }) => {
-  const [activeSubTab, setActiveSubTab] = React.useState(forceTab || "formula");
+  const [activeSubTab, setActiveSubTab] = useState(forceTab || "formula");
   // When forceTab changes (switching between separate tabs), update active sub-tab
-  React.useEffect(() => {
+  useEffect(() => {
     if (forceTab) setActiveSubTab(forceTab);
   }, [forceTab]);
-  const [newMed, setNewMed] = React.useState({
+  const [newMed, setNewMed] = useState({
     nombre: "",
     presentacion: "",
     dosis: "",
@@ -172,16 +172,16 @@ export const TabFormulaDerivacion = ({
     duracion: "",
     indicaciones: "",
   });
-  const [newDeriv, setNewDeriv] = React.useState({
+  const [newDeriv, setNewDeriv] = useState({
     especialidad: "",
     motivo: "",
     urgencia: "Electiva",
     observaciones: "",
   });
-  const [derivSearch, setDerivSearch] = React.useState("");
-  const [showDerivSugg, setShowDerivSugg] = React.useState(false);
-  const derivRef = React.useRef(null);
-  React.useEffect(() => {
+  const [derivSearch, setDerivSearch] = useState("");
+  const [showDerivSugg, setShowDerivSugg] = useState(false);
+  const derivRef = useRef(null);
+  useEffect(() => {
     const h = (e) => {
       if (derivRef.current && !derivRef.current.contains(e.target))
         setShowDerivSugg(false);

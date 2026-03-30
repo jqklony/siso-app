@@ -5,8 +5,9 @@ import { useUIStore } from '../stores/uiStore.js';
 import { usePatientsStore } from '../stores/patientsStore.js';
 import { useCompaniesStore } from '../stores/companiesStore.js';
 // Import all utils
-import { _ls, _ss, _SB_URL, _SB_KEY, _sbSet, _sbGetAll, _sbDelete, _sync, _patKey, _patKeyCloud, _compKey, _sbStorageUpload, _sbStorageGetSignedUrl, _sbStorageDelete } from '../utils/storage.js';
+import { _ls, _ss, _SB_URL, _SB_KEY, _sbSet, _sbGetAll, _sbDelete, _sync, _patKey, _patKeyCloud, _compKey, _sbStorageUpload, _sbStorageGetSignedUrl, _sbStorageDelete, sp, sps, _compKeyCloud, _sbQueue } from '../utils/storage.js';
 import { _sha256, _pbkdf2Hash, _verifyPassword, _sanitize, _H } from '../utils/crypto.js';
+import { _totpBase32Chars, _totpBase32ToBytes, _totpGenSecret, _totpVerify, _totpGetOtpAuthUrl, _totpGetQRCodeUrl } from '../utils/totp.js';
 import { _rl, _rlCheck, _SESSION_TIMEOUT_MS, _resetSessionTimer } from '../utils/security.jsx';
 import { numeroALetras, analyzeBP, analyzeHR, analyzeBMI, getSpanishDate, NORMAL_DESCRIPTIONS_SYSTEMS } from '../utils/helpers.js';
 import { _generarHashHC, _generarCodigoQR, _formatFirmaDigital } from '../utils/firma.js';
@@ -23,9 +24,10 @@ import { CUPS_OCUPACIONAL } from '../data/cups.js';
 import { CIE10_OCUPACIONAL } from '../data/cie10.js';
 import { PLAN_CONFIG } from '../data/planConfig.js';
 import { ARL_LIST, AFP_LIST, EPS_LIST, CONTRATO_LIST, TURNO_LIST, ETNIA_LIST, SPECIALTIES_LIST } from '../data/dropdowns.js';
-import { ORG_DEFAULT_ID, ORG_CONFIG_DEFAULT, _genOrgId, SECRETARIA_PERMISOS_DEFAULT, MEDICO_SIEMPRE_PUEDE, DEFAULT_DOCTOR_DATA, initialOccupPatientState, initialGeneralPatientState, initialUsers, initialCompanyState, _isAdmin, _isAdminEmpresa, _secretariaPuede, _canUse, _contarHC } from '../data/initialState.js';
+import { ORG_DEFAULT_ID, ORG_CONFIG_DEFAULT, _genOrgId, SECRETARIA_PERMISOS_DEFAULT, MEDICO_SIEMPRE_PUEDE, DEFAULT_DOCTOR_DATA, initialOccupPatientState, initialGeneralPatientState, initialUsers, initialCompanyState, _isAdmin, _isAdminEmpresa, _secretariaPuede, _canUse, _contarHC , _isAdminOrEmpresa, _secretariaMedicoAsignado} from '../data/initialState.js';
 
 export function useAppState() {
+  let _syncStatusCallback = null;
   const [view, setView] = useState(() => {
     // Restaurar vista activa al recargar - si había sesión activa
     try {
@@ -468,8 +470,8 @@ export function useAppState() {
   // Portal Público (acceso sin login)
   const [showPortalPublico, setShowPortalPublico] = useState(false);
   // B-29: IA Resumen
-  const [aiResumen, setAiResumen] = React.useState("");
-  const [aiCargando, setAiCargando] = React.useState(false);
+  const [aiResumen, setAiResumen] = useState("");
+  const [aiCargando, setAiCargando] = useState(false);
   // B-26: ARL
   const [arlTab, setArlTab] = useState("at");
   // B-31: SVE
@@ -651,18 +653,18 @@ export function useAppState() {
   const activeDoctorData = currentUser?.doctorData || DEFAULT_DOCTOR_DATA;
   const activeSignature = currentUser?.doctorData?.signature || doctorSignature;
   // ── Bloque 4-A: useMemo para cómputos costosos (bajo rendimiento) ─────────
-  const _memoPatients = React.useMemo(() => patientsList, [patientsList]);
-  const _memoCompanies = React.useMemo(() => companies, [companies]);
-  const _memoBills = React.useMemo(() => savedBillsList, [savedBillsList]);
-  const _memoReports = React.useMemo(() => savedReports, [savedReports]);
-  const _memoPatientsCount = React.useMemo(() => patientsList.length, [patientsList]);
-  const _memoClosedHCs = React.useMemo(
+  const _memoPatients = useMemo(() => patientsList, [patientsList]);
+  const _memoCompanies = useMemo(() => companies, [companies]);
+  const _memoBills = useMemo(() => savedBillsList, [savedBillsList]);
+  const _memoReports = useMemo(() => savedReports, [savedReports]);
+  const _memoPatientsCount = useMemo(() => patientsList.length, [patientsList]);
+  const _memoClosedHCs = useMemo(
     () => patientsList.filter(p => p.estadoHistoria === "Cerrada" && !p._archivado),
     [patientsList]
   );
   // Debounce ref para guardado de caja (evita escrituras en cada keystroke)
   const _cajaSaveTimer = useRef(null);
-  const saveCajaDebounced = React.useCallback((movs) => {
+  const saveCajaDebounced = useCallback((movs) => {
     if (_cajaSaveTimer.current) clearTimeout(_cajaSaveTimer.current);
     _cajaSaveTimer.current = setTimeout(() => {
       try {
@@ -897,18 +899,18 @@ export function useAppState() {
   // Load desde localStorage (inmediato) + Supabase (en background, gana si más reciente)
   useEffect(() => {
     // 1. Carga local inmediata para que la UI no espere
-    const sessionUser = (() => {
+    const _sessionUserInit = (() => {
       try {
         return JSON.parse(_ls.getItem("siso_session") || "null")?.user;
       } catch {
         return null;
       }
     })();
-    setCompanies(sp(_compKey(sessionUser || "shared"), []));
+    setCompanies(sp(_compKey(_sessionUserInit || "shared"), []));
     // Pacientes: cargar SOLO los del usuario de sesión activa (aislamiento absoluto)
     // Si no hay sesión guardada, dejar la lista vacía - se cargará en handleLogin
-    if (sessionUser) {
-      setPatientsList(sp(_patKey(sessionUser), []));
+    if (_sessionUserInit) {
+      setPatientsList(sp(_patKey(_sessionUserInit), []));
     }
     // NO cargar 'siso_db_patients' genérico - mezclaria pacientes de todos los médicos
     // ══ RECUPERACIÓN: Si usuario guardado tiene passHash vacío (post B-03), restaurar desde initialUsers ══
@@ -1224,7 +1226,7 @@ export function useAppState() {
   }, [data, currentUser, view]);
   const _TIMEOUT_MS = 30 * 60 * 1000; // 30 minutos
   const _WARN_MS = 29 * 60 * 1000; // aviso 1 min antes
-  const _resetInactivity = React.useCallback(() => {
+  const _resetInactivity = useCallback(() => {
     setInactivityWarning(false);
     clearTimeout(_inactivityRef.current);
     clearTimeout(_warnRef.current);
@@ -1252,7 +1254,7 @@ export function useAppState() {
       );
     }, _TIMEOUT_MS);
   }, [currentUser]);
-  React.useEffect(() => {
+  useEffect(() => {
     if (!currentUser) return;
     const events = ["mousemove", "keydown", "click", "touchstart", "scroll"];
     events.forEach((ev) =>
@@ -3435,6 +3437,25 @@ Esta historia clínica debe conservarse mínimo 20 años.
   };
   // ─────────────────────────────────────────────────────────────────────────
   // ─── RETURN ALL STATE AND HANDLERS ───────────────────────────────────────
+  // Hook-scoped refs for values computed inside useEffect
+  let _initSess = null;
+  let applyCloud = null;
+  let handler = null;
+  let doAutoBackup = null;
+  let _tipoExamen = null;
+  let _contextoTipo = null;
+  let lista = null;
+  let fmtDist = null;
+  let _loadScoped = null;
+  let _tipoConsulta = null;
+  let op = null;
+  let sigsRestored = null;
+  let billsR = null;
+  let repsR = null;
+  let closedPats = null;
+
+  const sessionUser = currentUser?.user || null;
+
   return {
     view,
     setView,
@@ -3773,6 +3794,9 @@ Esta historia clínica debe conservarse mínimo 20 años.
     showConfirm,
     showPrompt,
     sessionUser,
+    activeDoctorData,
+    activeSignature,
+    _resetInactivity,
     _initSess,
     applyCloud,
     handler,

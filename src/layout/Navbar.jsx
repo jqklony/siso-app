@@ -1,3 +1,4 @@
+import React from 'react';
 // ============================================================
 // Navbar.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

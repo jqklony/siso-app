@@ -33,10 +33,10 @@ export const LicenciasTab = ({
     );
   }
 
-  const [licEditId, setLicEditId] = React.useState(null);
-  const [licForm, setLicForm] = React.useState({});
-  const [licSaved, setLicSaved] = React.useState(false);
-  const [licErrors, setLicErrors] = React.useState([]); // validación método de pago
+  const [licEditId, setLicEditId] = useState(null);
+  const [licForm, setLicForm] = useState({});
+  const [licSaved, setLicSaved] = useState(false);
+  const [licErrors, setLicErrors] = useState([]); // validación método de pago
 
   const planOrder = ["libre", "starter", "pro", "clinica"];
   const planColors = {
@@ -47,7 +47,7 @@ export const LicenciasTab = ({
   };
 
   // ── Auto-apertura cuando viene de "Activar para usuario" en renderPlanes ──
-  React.useEffect(() => {
+  useEffect(() => {
     if (!pendingActivationPlan) return;
     // Abrir el primer usuario que no sea el admin activo, o el primero de la lista
     const target =

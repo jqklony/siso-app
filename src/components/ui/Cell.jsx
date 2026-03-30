@@ -1,3 +1,4 @@
+import React from 'react';
 // ============================================================
 // Cell.jsx — Módulo extraído del monolito SISO-APP
 // Estado centralizado via AppContext (useApp hook)

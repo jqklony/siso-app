@@ -1,3 +1,4 @@
+import React from 'react';
 // ============================================================
 // AppContext.jsx — Combina todos los stores en un único contexto
 // ============================================================
