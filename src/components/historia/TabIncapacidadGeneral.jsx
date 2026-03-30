@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Printer
+} from "lucide-react";
 // ============================================================
 // TabIncapacidadGeneral.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

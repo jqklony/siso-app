@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  LogOut
+} from "lucide-react";
 
 // ─── Companies Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

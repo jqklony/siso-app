@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Download
+} from "lucide-react";
 
 // ─── Caja Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

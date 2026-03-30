@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  ChevronLeft, Save, Upload
+} from "lucide-react";
 
 // ─── PerfilIPS Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

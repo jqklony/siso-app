@@ -450,6 +450,7 @@ export default function App() {
     goTo,
     _goBackDirect,
     goBack,
+    handleLogin,
   } = state;
 
   // Render helpers (receive state via closure)

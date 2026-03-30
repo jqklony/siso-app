@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  FileSearch, Lock, LogOut, Printer, Search
+} from "lucide-react";
 
 // ─── Verification Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  BrainCircuit, Stethoscope, UploadCloud
+} from "lucide-react";
 
 // ─── LoginPage Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith
@@ -405,6 +408,7 @@ export const LoginPage = (props) => {
     LoginForm,
     PortalPublicoTrabajador,
     AgendaFieldF,
+    handleLogin,
     ...rest
   } = props;
 

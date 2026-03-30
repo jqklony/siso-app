@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { CheckSquare, Square, X } from 'lucide-react';
+import {
+  CheckSquare, ChevronRight, ClipboardList, Sparkles, Square
+} from "lucide-react";
 import { RECOMENDACIONES_CATALOG } from '../../data/recomendaciones.js';
 
 // MÓDULO 9: PANEL DE RECOMENDACIONES CHECKLIST

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  ClipboardList, Plus, Save
+} from "lucide-react";
 // ============================================================
 // EvolucionModal.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

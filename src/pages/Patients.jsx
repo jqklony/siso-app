@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Eye, FileCheck, History, LogOut, PlusCircle, Search, Users
+} from "lucide-react";
 
 // ─── Patients Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

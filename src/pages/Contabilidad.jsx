@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  ChevronLeft, Download
+} from "lucide-react";
 
 // ─── Contabilidad Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

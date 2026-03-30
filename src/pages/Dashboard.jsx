@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  AlertTriangle, Clock, Eye, FileCheck, FileSearch, FileText, HardDrive, Heart, Receipt, Shield, Stethoscope, UserCheck, Users
+} from "lucide-react";
 
 // ─── Dashboard Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

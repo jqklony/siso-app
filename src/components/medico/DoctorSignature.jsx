@@ -1,5 +1,6 @@
 import React from 'react';
-import { User } from 'lucide-react';
+import { User, Stethoscope } from 'lucide-react';
+import { DEFAULT_DOCTOR_DATA } from '../../data/initialState.js';
 
 export const DoctorSignature = ({ signature, data, showData = true }) => {
   const doc = data || DEFAULT_DOCTOR_DATA;

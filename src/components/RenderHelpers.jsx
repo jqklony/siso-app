@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  BrainCircuit, ClipboardList, Cloud, Download, FileCheck, FileSignature, HardDrive, Lock, LogOut, MessageSquare, Plus, Printer, Save, Unlock, UploadCloud, Wifi, WifiOff
+} from "lucide-react";
 
 // ─── Render Helpers Factory ──────────────────────────────────────────────────
 // Returns all render helper functions bound to the provided state

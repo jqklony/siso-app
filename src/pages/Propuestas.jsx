@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  FileText, LogOut, Plus, Printer, Save
+} from "lucide-react";
 
 // ─── Propuestas Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

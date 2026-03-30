@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  LogOut, Printer, Receipt, Save
+} from "lucide-react";
 
 // ─── Bill Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

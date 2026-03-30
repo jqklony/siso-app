@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  ClipboardList, History, ShieldAlert, Sparkles
+} from "lucide-react";
 
 // ─── HistoriaOcupacional Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

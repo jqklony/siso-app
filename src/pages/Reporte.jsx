@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  BrainCircuit, FileText, HardDrive, LogOut, Printer, Receipt, ShieldCheck, Sparkles, UserCheck
+} from "lucide-react";
 
 // ─── Reporte Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

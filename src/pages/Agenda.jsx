@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  LogOut, UserCheck
+} from "lucide-react";
 
 // ─── Agenda Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Plus, Search, Sparkles
+} from "lucide-react";
 
 // ─── HistoriaGeneral Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

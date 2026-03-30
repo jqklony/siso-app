@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
+import {
+  BrainCircuit, ClipboardList, Cloud, Download, FileCheck, FileSignature, HardDrive, Lock, LogOut, MessageSquare, Printer, Save, Unlock, UploadCloud, Wifi, WifiOff
+} from "lucide-react";
 import { useAuthStore } from '../../stores/authStore.js';
 import { useUIStore } from '../../stores/uiStore.js';
 import { usePatientsStore } from '../../stores/patientsStore.js';

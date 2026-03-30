@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  FileText, Lock
+} from "lucide-react";
 
 // ─── Certificado Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

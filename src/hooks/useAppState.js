@@ -1809,295 +1809,295 @@ JSON REQUERIDO (sin markdown, sin texto adicional):
     showAlert("✅ Configuración de IA guardada en la nube.");
   };
   
-const handleLogin = (u, p) => {
-    // SEC: Rate limiting - verificar bloqueo
-    if (_rl.isBlocked()) {
-      showAlert(`⛔ Demasiados intentos fallidos. Intente de nuevo en ${_rl.getRemainingMin()} minuto(s).`);
-      return;
-    }
-
-  
-// ============================================================
-    // FIX C-01: SOLO comparar contra passHash (SHA-256) - eliminado fallback texto plano
-    _sha256(p).then(async (hash) => {
-      // Migración automática: si el usuario tiene .pass en texto plano (versión anterior),
-      // se migra a passHash en este momento sin exponer el texto plano
-      const migratedList = usersList.map((usr) => {
-        if (!usr.passHash && usr.pass) {
-          // Programar migración asíncrona
-          _sha256(usr.pass).then((h) => {
-            const updated = usersList.map((x) =>
-              x.id === usr.id ? { ...x, passHash: h, pass: undefined } : x
-            );
-            _sync("siso_users", JSON.stringify(updated));
-          });
-        }
-        return usr;
-      });
-      // SEC-09: verificar con PBKDF2 (salt) o SHA-256 legacy (sin salt)
-      let found = null;
-      for (const x of migratedList) {
-        if (x.user === u) {
-          const ok = await _verifyPassword(p, x.passHash, x.passSalt);
-          if (ok) {
-            found = x;
-            break;
-          }
-        }
-      }
-                // CAMBIO 7 - SEC: Fallback a Supabase si usuario no hallado en lista local
-                          // Resuelve el caso de nuevo dispositivo / caché borrado / contraseña cambiada
-                                    if (!found) {
-                                                  const cloudData = await _sbGetAll();
-                                                              if (cloudData?.["siso_users"]?.value && Array.isArray(cloudData["siso_users"].value)) {
-                                                                              const cloudUserList = cloudData["siso_users"].value;
-                                                                                            // Sincronizar lista local con datos de Supabase
-                                                                                                          setUsersList(prev => {
-                                                                                                                            const merged = [...prev];
-                                                                                                                                            cloudUserList.forEach(cu => {
-                                                                                                                                                                if (!merged.find(m => m.user === cu.user)) merged.push(cu);
-                                                                                                                                                                                });
-                                                                                                                                                                                                _ls.setItem("siso_users", JSON.stringify(merged));
-                                                                                                                                                                                                                return merged;
-                                                                                                                                                                                                                              });
-                                                                                                                                                                                                                                            // Re-verificar credenciales contra lista de Supabase
-                                                                                                                                                                                                                                                          for (const x of cloudUserList) {
-                                                                                                                                                                                                                                                                            if (x.user === u) {
-                                                                                                                                                                                                                                                                                                const ok = await _verifyPassword(p, x.passHash, x.passSalt);
-                                                                                                                                                                                                                                                                                                                  if (ok) { found = x; break; }
-                                                                                                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                                                                                                                                                                      }
-      if (found && found.activo === false) {
-        showAlert(
-          "⛔ Esta cuenta está desactivada. Contacte al administrador."
-        );
+  const handleLogin = (u, p) => {
+      // SEC: Rate limiting - verificar bloqueo
+      if (_rl.isBlocked()) {
+        showAlert(`⛔ Demasiados intentos fallidos. Intente de nuevo en ${_rl.getRemainingMin()} minuto(s).`);
         return;
       }
-      if (found) {
-        // B-18: Si el usuario tiene 2FA activo, pausar y pedir token
-        if (found.twoFA?.enabled && found.twoFA?.secret) {
-          setTwoFAStep({ foundUser: found });
-          setTwoFAToken("");
-          setTwoFAError("");
+  
+    
+  // ============================================================
+      // FIX C-01: SOLO comparar contra passHash (SHA-256) - eliminado fallback texto plano
+      _sha256(p).then(async (hash) => {
+        // Migración automática: si el usuario tiene .pass en texto plano (versión anterior),
+        // se migra a passHash en este momento sin exponer el texto plano
+        const migratedList = usersList.map((usr) => {
+          if (!usr.passHash && usr.pass) {
+            // Programar migración asíncrona
+            _sha256(usr.pass).then((h) => {
+              const updated = usersList.map((x) =>
+                x.id === usr.id ? { ...x, passHash: h, pass: undefined } : x
+              );
+              _sync("siso_users", JSON.stringify(updated));
+            });
+          }
+          return usr;
+        });
+        // SEC-09: verificar con PBKDF2 (salt) o SHA-256 legacy (sin salt)
+        let found = null;
+        for (const x of migratedList) {
+          if (x.user === u) {
+            const ok = await _verifyPassword(p, x.passHash, x.passSalt);
+            if (ok) {
+              found = x;
+              break;
+            }
+          }
+        }
+                  // CAMBIO 7 - SEC: Fallback a Supabase si usuario no hallado en lista local
+                            // Resuelve el caso de nuevo dispositivo / caché borrado / contraseña cambiada
+                                      if (!found) {
+                                                    const cloudData = await _sbGetAll();
+                                                                if (cloudData?.["siso_users"]?.value && Array.isArray(cloudData["siso_users"].value)) {
+                                                                                const cloudUserList = cloudData["siso_users"].value;
+                                                                                              // Sincronizar lista local con datos de Supabase
+                                                                                                            setUsersList(prev => {
+                                                                                                                              const merged = [...prev];
+                                                                                                                                              cloudUserList.forEach(cu => {
+                                                                                                                                                                  if (!merged.find(m => m.user === cu.user)) merged.push(cu);
+                                                                                                                                                                                  });
+                                                                                                                                                                                                  _ls.setItem("siso_users", JSON.stringify(merged));
+                                                                                                                                                                                                                  return merged;
+                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                              // Re-verificar credenciales contra lista de Supabase
+                                                                                                                                                                                                                                                            for (const x of cloudUserList) {
+                                                                                                                                                                                                                                                                              if (x.user === u) {
+                                                                                                                                                                                                                                                                                                  const ok = await _verifyPassword(p, x.passHash, x.passSalt);
+                                                                                                                                                                                                                                                                                                                    if (ok) { found = x; break; }
+                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                                                                                                                                        }
+        if (found && found.activo === false) {
+          showAlert(
+            "⛔ Esta cuenta está desactivada. Contacte al administrador."
+          );
           return;
         }
-        // ══ B-05: Resetear contador de intentos fallidos en login exitoso ══
-        setLoginAttempts(0);
-        _ls.removeItem("siso_login_attempts");
-        _ls.removeItem("siso_login_blocked_until");
-        // CIBERSEGURIDAD: Agregar sesionId único al usuario (trazabilidad RDA Res. 1888/2025)
-        const sesId =
-          "SES-" +
-          Date.now().toString(36).toUpperCase() +
-          "-" +
-          Math.random().toString(36).substr(2, 6).toUpperCase();
-        // FASE 2: Asegurar que el usuario tiene orgId (migración automática de datos existentes)
-        const foundConOrg = found.orgId
-          ? found
-          : { ...found, orgId: ORG_DEFAULT_ID };
-        const foundConSesion = { ...foundConOrg, sesionId: sesId };
-        setCurrentUser(foundConSesion);
-        // CIBERSEGURIDAD: Activar timer de sesión 30 min (Punto 4 - Supabase/sesión segura)
-        _resetSessionTimer(() => {
-          setCurrentUser(null);
-          setView("login");
-          _ls.removeItem("siso_session");
-        });
-        const entrada = {
-          id: Date.now(),
-          fecha: new Date().toISOString(),
-          usuario: found.user,
-          nombreUsuario: found.name,
-          rol: found.role,
-          sesionId: sesId,
-          accion: "Login",
-          pacienteId: null,
-          tipo: "Autenticación",
-          userAgent:
-            typeof navigator !== "undefined"
-              ? navigator.userAgent?.substring(0, 120)
-              : "N/A",
-        };
-        setAuditLog((prev) => {
-          const n = [entrada, ...prev].slice(0, 500);
-          setTimeout(() => _sync("siso_audit_log", JSON.stringify(n)), 0);
-          return n;
-        });
-        // Al hacer login: cargar pacientes del médico específico (aislamiento)
-        // ── IPS: si el usuario tiene empresaId, usar storage compartido de empresa ──
-        const _storageUserId = found.empresaId
-          ? "empresa_" + found.empresaId
-          : found.user;
-        const userPatKey = _patKey(_storageUserId);
-        const userPatKeyCloud = _patKeyCloud(_storageUserId);
-        const localPats = sp(userPatKey, []);
-        // IPS: migración — si el usuario tenía datos personales, copiarlos al bucket empresa
-        if (found.empresaId) {
-          const personalPats = sp(_patKey(found.user), []);
-          if (personalPats.length > 0 && localPats.length === 0) {
-            // Primera vez con empresaId: migrar datos personales al bucket empresa
-            _ls.setItem(userPatKey, JSON.stringify(personalPats));
-            setPatientsList(personalPats);
-          } else if (personalPats.length > 0 && localPats.length > 0) {
-            // Merge: agregar pacientes personales que no estén en el bucket empresa
-            const existingIds = new Set(localPats.map((p) => p.id));
-            const nuevos = personalPats.filter((p) => !existingIds.has(p.id));
-            if (nuevos.length > 0) {
-              const merged = [...localPats, ...nuevos];
-              _ls.setItem(userPatKey, JSON.stringify(merged));
-              setPatientsList(merged);
+        if (found) {
+          // B-18: Si el usuario tiene 2FA activo, pausar y pedir token
+          if (found.twoFA?.enabled && found.twoFA?.secret) {
+            setTwoFAStep({ foundUser: found });
+            setTwoFAToken("");
+            setTwoFAError("");
+            return;
+          }
+          // ══ B-05: Resetear contador de intentos fallidos en login exitoso ══
+          setLoginAttempts(0);
+          _ls.removeItem("siso_login_attempts");
+          _ls.removeItem("siso_login_blocked_until");
+          // CIBERSEGURIDAD: Agregar sesionId único al usuario (trazabilidad RDA Res. 1888/2025)
+          const sesId =
+            "SES-" +
+            Date.now().toString(36).toUpperCase() +
+            "-" +
+            Math.random().toString(36).substr(2, 6).toUpperCase();
+          // FASE 2: Asegurar que el usuario tiene orgId (migración automática de datos existentes)
+          const foundConOrg = found.orgId
+            ? found
+            : { ...found, orgId: ORG_DEFAULT_ID };
+          const foundConSesion = { ...foundConOrg, sesionId: sesId };
+          setCurrentUser(foundConSesion);
+          // CIBERSEGURIDAD: Activar timer de sesión 30 min (Punto 4 - Supabase/sesión segura)
+          _resetSessionTimer(() => {
+            setCurrentUser(null);
+            setView("login");
+            _ls.removeItem("siso_session");
+          });
+          const entrada = {
+            id: Date.now(),
+            fecha: new Date().toISOString(),
+            usuario: found.user,
+            nombreUsuario: found.name,
+            rol: found.role,
+            sesionId: sesId,
+            accion: "Login",
+            pacienteId: null,
+            tipo: "Autenticación",
+            userAgent:
+              typeof navigator !== "undefined"
+                ? navigator.userAgent?.substring(0, 120)
+                : "N/A",
+          };
+          setAuditLog((prev) => {
+            const n = [entrada, ...prev].slice(0, 500);
+            setTimeout(() => _sync("siso_audit_log", JSON.stringify(n)), 0);
+            return n;
+          });
+          // Al hacer login: cargar pacientes del médico específico (aislamiento)
+          // ── IPS: si el usuario tiene empresaId, usar storage compartido de empresa ──
+          const _storageUserId = found.empresaId
+            ? "empresa_" + found.empresaId
+            : found.user;
+          const userPatKey = _patKey(_storageUserId);
+          const userPatKeyCloud = _patKeyCloud(_storageUserId);
+          const localPats = sp(userPatKey, []);
+          // IPS: migración — si el usuario tenía datos personales, copiarlos al bucket empresa
+          if (found.empresaId) {
+            const personalPats = sp(_patKey(found.user), []);
+            if (personalPats.length > 0 && localPats.length === 0) {
+              // Primera vez con empresaId: migrar datos personales al bucket empresa
+              _ls.setItem(userPatKey, JSON.stringify(personalPats));
+              setPatientsList(personalPats);
+            } else if (personalPats.length > 0 && localPats.length > 0) {
+              // Merge: agregar pacientes personales que no estén en el bucket empresa
+              const existingIds = new Set(localPats.map((p) => p.id));
+              const nuevos = personalPats.filter((p) => !existingIds.has(p.id));
+              if (nuevos.length > 0) {
+                const merged = [...localPats, ...nuevos];
+                _ls.setItem(userPatKey, JSON.stringify(merged));
+                setPatientsList(merged);
+              } else {
+                setPatientsList(localPats);
+              }
             } else {
               setPatientsList(localPats);
             }
           } else {
-            setPatientsList(localPats);
+            setPatientsList(localPats); // inmediato desde local
           }
-        } else {
-          setPatientsList(localPats); // inmediato desde local
-        }
-        _ls.setItem("siso_active_form", ""); // limpiar borrador del usuario anterior
-        // Cargar desde Supabase: pacientes propios, empresas propias + API keys
-        const userCompKey = _compKey(_storageUserId);
-        const userCompKeyCloud = _compKeyCloud(_storageUserId);
-        let localComps = sp(userCompKey, []);
-        // ── IPS: si empresa user no tiene companies, copiar del admin de la org ──
-        if (found.empresaId && localComps.length === 0) {
-          // Buscar companies en el storage del admin de la org
-          const allUsers = JSON.parse(_ls.getItem("siso_users") || "[]");
-          const orgAdmins = allUsers.filter(
-            (u) =>
-              u.orgId === found.orgId &&
-              (_isAdmin(u.role) || u.role === "super_admin")
+          _ls.setItem("siso_active_form", ""); // limpiar borrador del usuario anterior
+          // Cargar desde Supabase: pacientes propios, empresas propias + API keys
+          const userCompKey = _compKey(_storageUserId);
+          const userCompKeyCloud = _compKeyCloud(_storageUserId);
+          let localComps = sp(userCompKey, []);
+          // ── IPS: si empresa user no tiene companies, copiar del admin de la org ──
+          if (found.empresaId && localComps.length === 0) {
+            // Buscar companies en el storage del admin de la org
+            const allUsers = JSON.parse(_ls.getItem("siso_users") || "[]");
+            const orgAdmins = allUsers.filter(
+              (u) =>
+                u.orgId === found.orgId &&
+                (_isAdmin(u.role) || u.role === "super_admin")
+            );
+            for (const adm of orgAdmins) {
+              const admComps = sp(_compKey(adm.user), []);
+              if (admComps.length > 0) {
+                // Copiar la empresa específica + "PARTICULAR" si existe
+                const miEmpresa = admComps.filter(
+                  (c) => c.id === found.empresaId
+                );
+                if (miEmpresa.length > 0) {
+                  localComps = miEmpresa;
+                  _ls.setItem(userCompKey, JSON.stringify(localComps));
+                  break;
+                }
+              }
+            }
+          }
+          setCompanies(localComps);
+          // ── PASO 6: cargar caja, agenda, atenciones y facturas aislados por empresa ──
+          const _loadScoped = (scopedKey, globalKey) => {
+            const s = sp(scopedKey, null);
+            if (s !== null) return s;
+            // Migración: si hay datos en clave global, copiar a clave propia
+            const g = sp(globalKey, []);
+            if (g.length > 0) {
+              try {
+                _ls.setItem(scopedKey, JSON.stringify(g));
+              } catch {}
+            }
+            return g;
+          };
+          setCajaMovimientos(
+            _loadScoped(`siso_caja_${_storageUserId}`, "siso_caja")
           );
-          for (const adm of orgAdmins) {
-            const admComps = sp(_compKey(adm.user), []);
-            if (admComps.length > 0) {
-              // Copiar la empresa específica + "PARTICULAR" si existe
-              const miEmpresa = admComps.filter(
-                (c) => c.id === found.empresaId
-              );
-              if (miEmpresa.length > 0) {
-                localComps = miEmpresa;
-                _ls.setItem(userCompKey, JSON.stringify(localComps));
-                break;
+          setAgendados(
+            _loadScoped(`siso_agendados_${_storageUserId}`, "siso_agendados")
+          );
+          setAtencionesCerradas(
+            _loadScoped(
+              `siso_atenciones_${_storageUserId}`,
+              "siso_atenciones_cerradas"
+            )
+          );
+          setSavedBillsList(
+            _loadScoped(`siso_saved_bills_${_storageUserId}`, "siso_saved_bills")
+          );
+          _sbGetAll().then((cloud) => {
+            // Pacientes del usuario específico (o empresa compartida)
+            const cloudPats = cloud?.[userPatKeyCloud]?.value;
+            const currentLocalPats = sp(userPatKey, []);
+            if (
+              Array.isArray(cloudPats) &&
+              cloudPats.length >= currentLocalPats.length
+            ) {
+              setPatientsList(cloudPats);
+              _ls.setItem(userPatKey, JSON.stringify(cloudPats));
+            }
+            // Empresas del usuario específico (o empresa compartida)
+            const cloudComps = cloud?.[userCompKeyCloud]?.value;
+            if (
+              Array.isArray(cloudComps) &&
+              cloudComps.length >= localComps.length
+            ) {
+              setCompanies(cloudComps);
+              _ls.setItem(userCompKey, JSON.stringify(cloudComps));
+            } else if (localComps.length === 0) {
+              // Si no hay empresas propias, verificar clave legacy compartida
+              const legacyComps = cloud?.["siso_companies"]?.value;
+              if (Array.isArray(legacyComps) && legacyComps.length > 0) {
+                const mine = legacyComps.filter(
+                  (co) => co._userId === found.user || !co._userId
+                );
+                if (mine.length > 0) {
+                  setCompanies(mine);
+                  _ls.setItem(userCompKey, JSON.stringify(mine));
+                  // Migrar automáticamente a clave propia
+                  _sbSet(userCompKeyCloud, mine);
+                }
               }
             }
-          }
-        }
-        setCompanies(localComps);
-        // ── PASO 6: cargar caja, agenda, atenciones y facturas aislados por empresa ──
-        const _loadScoped = (scopedKey, globalKey) => {
-          const s = sp(scopedKey, null);
-          if (s !== null) return s;
-          // Migración: si hay datos en clave global, copiar a clave propia
-          const g = sp(globalKey, []);
-          if (g.length > 0) {
-            try {
-              _ls.setItem(scopedKey, JSON.stringify(g));
-            } catch {}
-          }
-          return g;
-        };
-        setCajaMovimientos(
-          _loadScoped(`siso_caja_${_storageUserId}`, "siso_caja")
-        );
-        setAgendados(
-          _loadScoped(`siso_agendados_${_storageUserId}`, "siso_agendados")
-        );
-        setAtencionesCerradas(
-          _loadScoped(
-            `siso_atenciones_${_storageUserId}`,
-            "siso_atenciones_cerradas"
-          )
-        );
-        setSavedBillsList(
-          _loadScoped(`siso_saved_bills_${_storageUserId}`, "siso_saved_bills")
-        );
-        _sbGetAll().then((cloud) => {
-          // Pacientes del usuario específico (o empresa compartida)
-          const cloudPats = cloud?.[userPatKeyCloud]?.value;
-          const currentLocalPats = sp(userPatKey, []);
-          if (
-            Array.isArray(cloudPats) &&
-            cloudPats.length >= currentLocalPats.length
-          ) {
-            setPatientsList(cloudPats);
-            _ls.setItem(userPatKey, JSON.stringify(cloudPats));
-          }
-          // Empresas del usuario específico (o empresa compartida)
-          const cloudComps = cloud?.[userCompKeyCloud]?.value;
-          if (
-            Array.isArray(cloudComps) &&
-            cloudComps.length >= localComps.length
-          ) {
-            setCompanies(cloudComps);
-            _ls.setItem(userCompKey, JSON.stringify(cloudComps));
-          } else if (localComps.length === 0) {
-            // Si no hay empresas propias, verificar clave legacy compartida
-            const legacyComps = cloud?.["siso_companies"]?.value;
-            if (Array.isArray(legacyComps) && legacyComps.length > 0) {
-              const mine = legacyComps.filter(
-                (co) => co._userId === found.user || !co._userId
-              );
-              if (mine.length > 0) {
-                setCompanies(mine);
-                _ls.setItem(userCompKey, JSON.stringify(mine));
-                // Migrar automáticamente a clave propia
-                _sbSet(userCompKeyCloud, mine);
-              }
+            // API keys del usuario
+            const aiKeyCloud = cloud?.[`siso_ai_keys_${found.user}`]?.value;
+            if (aiKeyCloud) {
+              _ss.setItem("siso_ai_keys", JSON.stringify(aiKeyCloud));
+              setAiConfig((prev) => ({ ...prev, keys: aiKeyCloud }));
             }
-          }
-          // API keys del usuario
-          const aiKeyCloud = cloud?.[`siso_ai_keys_${found.user}`]?.value;
-          if (aiKeyCloud) {
-            _ss.setItem("siso_ai_keys", JSON.stringify(aiKeyCloud));
-            setAiConfig((prev) => ({ ...prev, keys: aiKeyCloud }));
-          }
-        });
-        // ══ B-07: Si primer login, forzar cambio de contraseña ══
-        if (foundConSesion.mustChangePassword) {
-          goTo("changePassword");
-        } else {
-          goTo("dashboard");
-        }
-      } else {
-        // ══ B-05: Rate limiting mejorado - 15 min, persistente, con audit log ══
-        setLoginAttempts((prev) => {
-          const next = prev + 1;
-          _ls.setItem("siso_login_attempts", String(next));
-          if (next >= 5) {
-            const blockedUntil = Date.now() + 15 * 60 * 1000; // 15 minutos (OWASP rec.)
-            setLoginBlockedUntil(blockedUntil);
-            _ls.setItem("siso_login_blocked_until", String(blockedUntil));
-            // Registrar en audit log como evento de seguridad
-            const alertaSeguridad = {
-              id: Date.now(),
-              fecha: new Date().toISOString(),
-              usuario: u,
-              tipo: "ALERTA_SEGURIDAD",
-              descripcion: `Login bloqueado tras 5 intentos fallidos para usuario: ${u}`,
-              ip: "cliente-web",
-            };
-            setAuditLog((prev2) => {
-              const n = [alertaSeguridad, ...prev2].slice(0, 500);
-              setTimeout(() => _sync("siso_audit_log", JSON.stringify(n)), 0);
-              return n;
-            });
-            showAlert(
-              "🔒 Acceso bloqueado por 15 minutos debido a múltiples intentos fallidos.\nSi olvidó su contraseña, contacte al administrador del sistema."
-            );
+          });
+          // ══ B-07: Si primer login, forzar cambio de contraseña ══
+          if (foundConSesion.mustChangePassword) {
+            goTo("changePassword");
           } else {
-            showAlert(
-              `⚠️ Credenciales incorrectas. Intentos fallidos: ${next}/5. Tras 5 intentos se bloqueará el acceso por 15 minutos.`
-            );
+            goTo("dashboard");
           }
-          return next;
-        });
-      }
-    });
-  };
+        } else {
+          // ══ B-05: Rate limiting mejorado - 15 min, persistente, con audit log ══
+          setLoginAttempts((prev) => {
+            const next = prev + 1;
+            _ls.setItem("siso_login_attempts", String(next));
+            if (next >= 5) {
+              const blockedUntil = Date.now() + 15 * 60 * 1000; // 15 minutos (OWASP rec.)
+              setLoginBlockedUntil(blockedUntil);
+              _ls.setItem("siso_login_blocked_until", String(blockedUntil));
+              // Registrar en audit log como evento de seguridad
+              const alertaSeguridad = {
+                id: Date.now(),
+                fecha: new Date().toISOString(),
+                usuario: u,
+                tipo: "ALERTA_SEGURIDAD",
+                descripcion: `Login bloqueado tras 5 intentos fallidos para usuario: ${u}`,
+                ip: "cliente-web",
+              };
+              setAuditLog((prev2) => {
+                const n = [alertaSeguridad, ...prev2].slice(0, 500);
+                setTimeout(() => _sync("siso_audit_log", JSON.stringify(n)), 0);
+                return n;
+              });
+              showAlert(
+                "🔒 Acceso bloqueado por 15 minutos debido a múltiples intentos fallidos.\nSi olvidó su contraseña, contacte al administrador del sistema."
+              );
+            } else {
+              showAlert(
+                `⚠️ Credenciales incorrectas. Intentos fallidos: ${next}/5. Tras 5 intentos se bloqueará el acceso por 15 minutos.`
+              );
+            }
+            return next;
+          });
+        }
+      });
+    };
   // B-18: Verificar token TOTP
   const handleVerify2FA = async () => {
     if (!twoFAStep) return;
@@ -3849,6 +3849,7 @@ Esta historia clínica debe conservarse mínimo 20 años.
     _goToDirect,
     goTo,
     _goBackDirect,
-    goBack
+    goBack,
+    handleLogin,
   };
 }

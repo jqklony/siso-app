@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  MessageSquare
+} from "lucide-react";
 // ============================================================
 // MensajesOverlay.jsx — Extraído del monolito App.jsx
 // Usa useApp() para acceder al estado centralizado

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Activity, Banknote, FileSignature, GraduationCap, HardDrive, Lock, LogOut, Pencil, Receipt, Save, Shield, UploadCloud, UserCheck, UserPlus
+} from "lucide-react";
 
 // ─── Users Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  BrainCircuit
+} from "lucide-react";
 
 // ─── SVE Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith

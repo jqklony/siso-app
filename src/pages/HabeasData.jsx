@@ -1,4 +1,7 @@
 import React from 'react';
+import {
+  Shield
+} from "lucide-react";
 
 // ─── HabeasData Page Component ─────────────────────────────────────────────
 // Auto-extracted from App.jsx monolith
