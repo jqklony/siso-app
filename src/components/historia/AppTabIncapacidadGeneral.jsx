@@ -1,31 +1,159 @@
-// ============================================================
-// TabIncapacidadGeneral.jsx — Extraído del monolito App.jsx
-// Usa useApp() para acceder al estado centralizado
-// ============================================================
+// AppTabIncapacidadGeneral.jsx — SISO-APP módulo extraído del monolito
+// Estado via Zustand stores
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import { useApp } from "../../AppContext.jsx";
-// Globals (helpers, constantes, componentes base)
-// Los componentes base ya están disponibles via globals
-import * as G from "../../globals.jsx";
+import { useAuthStore } from "../../stores/authStore.js";
+import { useUIStore } from "../../stores/uiStore.js";
+import { usePatientsStore } from "../../stores/patientsStore.js";
+import { useCompaniesStore } from "../../stores/companiesStore.js";
+import { useAppStore } from "../../stores/appStore.js";
+import { initialOccupPatientState, initialGeneralPatientState, initialUsers, DEFAULT_DOCTOR_DATA } from "../../data/initialState.js";
+import {
+  _ls, _ss, _sync, _patKey, _patKeyCloud, _compKey, _compKeyCloud,
+  _sbSet, _sbGetAll, _sbDelete, _sbQueue,
+  _SB_URL, _SB_KEY, _SB_SERVICE_KEY, _SB_HEADERS,
+  _sbStorageUpload, _sbStorageGetSignedUrl, _sbStorageDelete,
+  _sha256, _pbkdf2Hash, _verifyPassword, _hashSync, _H, _sanitize,
+  _isAdmin, _isAdminEmpresa, _isEmpresaUser, _isAdminOrEmpresa, _canUse,
+  _contarHC, _secretariaPuede, _secretariaMedicoAsignado,
+  _safeLogoUrl, _ipsDocLeftHtml,
+  _generarFacturaDIAN_UBL, _generarPaqueteRetencion, _generarCertificadoHTMLNormalizado,
+  getAllMeds, MEDICAMENTOS_CO_BASE, MEDICAMENTOS_CO,
+  ARL_LIST, AFP_LIST, EPS_LIST, CONTRATO_LIST, TURNO_LIST, ETNIA_LIST, SPECIALTIES_LIST,
+  DERIVACIONES_CATALOG, RESTRICCIONES_CATALOG,
+  PLAN_CONFIG, ORG_DEFAULT_ID, ORG_CONFIG_DEFAULT, _genOrgId,
+  numeroALetras, sanitizeInput, validatePasswordStrength,
+  _totpVerify, _totpGenSecret, _totpGetOtpAuthUrl, _totpGetQRCodeUrl,
+  _rlCheck, _sbRl, _securePost,
+  PrivacyModal, NotificacionModal, LoginForm, AgendaFieldF,
+  PortalPublicoTrabajador, ChangePasswordForm,
+  fetchWithTimeout, AI_PROVIDERS, parseAIJSON,
+  _generarRIPSJson, _descargarRIPSJson, _generarRDA, _descargarRDA,
+  _generarHashHC, _generarCodigoQR, _formatFirmaDigital,
+  _generarFHIRBundle, validarRIPSPaciente, validarRIPSLote,
+  CIE10_OCUPACIONAL, _buscarCIE10, CUPS_OCUPACIONAL, _buscarCUPS,
+  CIE11Badge, CUPSInput,
+  BrandLogo, DoctorSignature, DoctorSignatureMemo,
+  MedicamentoAutocomplete, ConsentimientoModal,
+  RecomendacionesChecklistPanel, LicenciasTab,
+  RECOMENDACIONES_CATALOG, DEFAULT_RECOMENDACIONES_SELECTED,
+  _validarContrasena, _FortalezaPass,
+} from "../../globals.jsx";
+import {
+  User, FileText, Stethoscope, ClipboardList, Printer, Activity,
+  Building2, FileCheck, AlertCircle, Sparkles, BrainCircuit, Loader2,
+  Save, History, CheckCircle2, Trash2, Eye, LogOut, Users, BarChart3,
+  PlusCircle, Search, Cloud, ShieldCheck, UserPlus, AlertTriangle,
+  Pill, GraduationCap, Clock, ShieldAlert, UploadCloud, FileSignature,
+  Share2, Plus, HardDrive, UserCheck, ChevronDown, Lock, Unlock,
+  FileSearch, Banknote, Receipt, Pencil, X, Heart, CheckSquare, Square,
+  ChevronRight, ChevronLeft, RefreshCw, WifiOff, Wifi, Shield,
+  MessageSquare, Download, Upload,
+} from "lucide-react";
+import { DoctorSignature as DoctorSignatureCmp } from "../../components/medico/DoctorSignature.jsx";
+import { CIE10Input as CIE10InputCmp } from "../../components/medico/CIE10Input.jsx";
+import { TabFormulaDerivacion } from "../../components/historia/TabFormulaDerivacion.jsx";
+import { AIConfigPanel } from "../../components/ui/AIConfigPanel.jsx";
+import { PlanGate } from "../../components/ui/PlanGate.jsx";
+import { InputGroup } from "../../components/ui/InputGroup.jsx";
+import { PrintStyles } from "../../components/ui/PrintStyles.jsx";
 
-export default function TabIncapacidadGeneral() {
-  const app = useApp();
+export default function AppTabIncapacidadGeneral() {
   const {
-    // Desestructura todo el estado que necesites
-    view, setView, currentUser, setCurrentUser,
-    data, setData, dataType, setDataType,
-    activeTab, setActiveTab,
-    patientsList, setPatientsList,
-    companies, setCompanies,
+    currentUser, setCurrentUser,
+    privacidadAceptada, setPrivacidadAceptada,
+    loginAttempts, setLoginAttempts, loginBlockedUntil, setLoginBlockedUntil,
+    recordFailedAttempt, resetLoginBlock, logout,
+  } = useAuthStore();
+  const {
+    view, setView, navStack, setNavStack, navigate, goBack,
+    alertMsg, setAlertMsg, clearAlert,
+    confirmConfig, setConfirmConfig,
+    promptConfig, setPromptConfig, promptValue, setPromptValue, clearModals,
+    syncStatus, setSyncStatus, showSyncReport, setShowSyncReport, syncReport, setSyncReport,
+    showAIConfig, setShowAIConfig, aiStatus, setAiStatus,
+    activeTab, setActiveTab, dataType, setDataType,
+  } = useUIStore();
+  const {
+    patientsList, setPatientsList, upsertPatient, deletePatient,
+    patientSearchTerm, setSearchTerm,
+    activePatientId, setActivePatientId,
+    atencionesCerradas, setAtencionesCerradas,
+    savedReports, setSavedReports,
+    savedBills, setSavedBills,
+  } = usePatientsStore();
+  const {
+    companies, setCompaniesList, upsertCompany, deleteCompany,
     usersList, setUsersList,
-    billData, setBillData,
-    saveStatus, setSaveStatus,
-    alertMsg, setAlertMsg,
-    showAlert, goTo,
-    ...app_rest
-  } = app;
+    doctorSignature, setDoctorSignature,
+    aiConfig, setAiConfig,
+  } = useCompaniesStore();
+  const {
+    auditLog, setAuditLog, data, setData,
+    isGenerating, setIsGenerating, isGeneratingRestr, setIsGeneratingRestr,
+    isGeneratingReco, setIsGeneratingReco, saveStatus, setSaveStatus,
+    _hcDirty, _setHcDirty, _exitHcConfirm, _setExitHcConfirm,
+    patientSuggestions, setPatientSuggestions,
+    historyNotification, setHistoryNotification,
+    showRestriccionesPanel, setShowRestriccionesPanel,
+    showHistoryModal, setShowHistoryModal,
+    ripsModalData, setRipsModalData, backupModalData, setBackupModalData,
+    hcChoiceAgenda, setHcChoiceAgenda, historyRecords, setHistoryRecords,
+    genPatSearch, setGenPatSearch, examSearch, setExamSearch,
+    examList, setExamList, showExamSuggs, setShowExamSuggs,
+    diagExamen, setDiagExamen, justExamen, setJustExamen,
+    printPreview, setPrintPreview,
+    selectedCompanyReport, setSelectedCompanyReport,
+    reporteActiveTab, setReporteActiveTab, certSelected, setCertSelected,
+    reportStartDate, setReportStartDate, reportEndDate, setReportEndDate,
+    reportAIResult, setReportAIResult, isGeneratingReport, setIsGeneratingReport,
+    showExportTable, setShowExportTable, precioPorPaciente, setPrecioPorPaciente,
+    showDianPanel, setShowDianPanel, dianProvider, setDianProvider, dianApiKey, setDianApiKey,
+    billData, setBillData, savedBillsList, setSavedBillsList,
+    portafolioItems, setPortafolioItems, portafolioForm, setPortafolioForm, portafolioEditId, setPortafolioEditId,
+    cotizaciones, setCotizaciones, cotizacionForm, setCotizacionForm,
+    cotizacionView, setCotizacionView, cotizacionSelId, setCotizacionSelId,
+    cajaMovimientos, setCajaMovimientos, cajaForm, setCajaForm, cajaTab, setCajaTab,
+    cajaFiltroPeriodo, setCajaFiltroPeriodo, cajaFiltroDesde, setCajaFiltroDesde, cajaFiltroHasta, setCajaFiltroHasta,
+    contabTab, setContabTab, contabPeriodo, setContabPeriodo,
+    asistenciaFecha, setAsistenciaFecha,
+    evolucionForm, setEvolucionForm, showEvolucionModal, setShowEvolucionModal,
+    selectedPackage, setSelectedPackage, packageChecklist, setPackageChecklist, showPackages, setShowPackages,
+    newComp, setNewComp, ipsPerfilForm, setIpsPerfilForm,
+    verificationCode, setVerificationCode, verificationFound, setVerificationFound,
+    activeUserMgmtTab, setActiveUserMgmtTab, pendingActivationPlan, setPendingActivationPlan,
+    sbCloudData, setSbCloudData, sbLoading, setSbLoading,
+    newUserForm, setNewUserForm, userEditId, setUserEditId, editForm, setEditForm,
+    propForm, setPropForm, selSvc, setSelSvc, propModulo, setPropModulo,
+    mensajes, setMensajes, showMensajePanel, setShowMensajePanel, showConsentModal, setShowConsentModal,
+    twoFAStep, setTwoFAStep, twoFAToken, setTwoFAToken, twoFAError, setTwoFAError,
+    habeasRequests, setHabeasRequests, showHabeasModal, setShowHabeasModal, habeasForm, setHabeasForm,
+    showPortalPublico, setShowPortalPublico,
+    arlTab, setArlTab, svePrograma, setSvePrograma, sveFiltroEmpresa, setSveFiltroEmpresa,
+    sveAIAnalisis, setSveAIAnalisis, sveAICargando, setSveAICargando, sveAIFiltroEmpresa, setSveAIFiltroEmpresa,
+    arlForm, setArlForm, arlGuardados, setArlGuardados,
+    showNotifModal, setShowNotifModal, notifData, setNotifData,
+    portalCodigo, setPortalCodigo, portalPaciente, setPortalPaciente, portalMultiple, setPortalMultiple,
+    epiEmpresa, setEpiEmpresa, epiPeriodo, setEpiPeriodo, epiTab, setEpiTab,
+    teleconsultas, setTeleconsultas, teleForm, setTeleForm, teleSalaActiva, setTeleSalaActiva, teleTab, setTeleTab,
+    mensajeRespuesta, setMensajeRespuesta,
+    agendados, setAgendados, showAgenda, setShowAgenda, agendaForm, setAgendaForm,
+    agendaSuggs, setAgendaSuggs, agendaTab, setAgendaTab,
+    showComposeMensaje, setShowComposeMensaje, composeMensaje, setComposeMensaje,
+    inactivityWarning, setInactivityWarning, inactivityCountdown, setInactivityCountdown,
+    companiesTab, setCompaniesTab, editingCompany, setEditingCompany,
+    cajaMedicoPeriodo, setCajaMedicoPeriodo, porcentajeMedico, setPorcentajeMedico,
+    medicoTurnoActivo, setMedicoTurnoActivo,
+    orgsList, setOrgsList, activeOrgId, setActiveOrgId, superAdminTab, setSuperAdminTab, newOrgForm, setNewOrgForm,
+    portalEmpresaCodigo, setPortalEmpresaCodigo, portalEmpresaEncontrada, setPortalEmpresaEncontrada,
+    portalEmpresaPacientes, setPortalEmpresaPacientes, portalEmpresaTab, setPortalEmpresaTab,
+    portalEmpresaBuscando, setPortalEmpresaBuscando, portalEmpresaFiltroDoc, setPortalEmpresaFiltroDoc,
+    portalActivadoInfo, setPortalActivadoInfo, portalEmpresaAdmin, setPortalEmpresaAdmin,
+    portalAdminTab, setPortalAdminTab, portalAdminLoginUser, setPortalAdminLoginUser,
+    portalAdminLoginPass, setPortalAdminLoginPass, nuevoMedicoEmpForm, setNuevoMedicoEmpForm,
+    sedeForm, setSedeForm, ipsCredForm, setIpsCredForm, ipsEditingEmpId, setIpsEditingEmpId,
+  } = useAppStore();
 
-  // ── Cuerpo original del render function ──────────────────
+  // ── Render function original ─────────────────────────
   const renderTabIncapacidadGeneral = () => {
     const diasCalc = (() => {
       if (!data.incapacidad?.desde || !data.incapacidad?.hasta)
@@ -385,7 +513,6 @@ th{background:#fee2e2;font-weight:900;text-align:left;color:#7f1d1d;}
   };
   // ─── RENDER: AGENDA / SALA DE ESPERA ───────────────────────────────────────
 
-  // ─────────────────────────────────────────────────────────
-
+  // ──────────────────────────────────────────────────────
   return renderTabIncapacidadGeneral();
 }
