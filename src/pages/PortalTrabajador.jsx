@@ -1,34 +1,453 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
-import { useAuthStore } from '../stores/authStore.js';
-import { useUIStore } from '../stores/uiStore.js';
-import { usePatientsStore } from '../stores/patientsStore.js';
-import { useCompaniesStore } from '../stores/companiesStore.js';
+import React from 'react';
 
+// ─── PortalTrabajador Page Component ─────────────────────────────────────────────
+// Auto-extracted from App.jsx monolith
 export const PortalTrabajador = (props) => {
-  const { currentUser, setCurrentUser, privacidadAceptada, setPrivacidadAceptada } = useAuthStore();
-  const { view, setView, navStack, setNavStack, navigate, goBack, alertMsg, setAlertMsg, activeTab, setActiveTab, dataType, setDataType, showAIConfig, setShowAIConfig, aiStatus, setAiStatus, syncStatus, setSyncStatus, confirmConfig, setConfirmConfig, promptConfig, setPromptConfig, promptValue, setPromptValue } = useUIStore();
-  const { patientsList, setPatientsList, patientSearchTerm, setSearchTerm, savedReports, setSavedReports, atencionesCerradas, setAtencionesCerradas, savedBills, setSavedBills } = usePatientsStore();
-  const { companies, setCompaniesList, usersList, setUsersList, doctorSignature, setDoctorSignature, aiConfig, setAiConfig } = useCompaniesStore();
-  // Props spread for backward compat
-  const { data, ...rest } = props;
-
-  // -------- EXTRACTED FROM MONOLITH: renderPortalTrabajador --------
-  // This component was auto-extracted. Review and refactor as needed.
+  const {
+    view,
+    setView,
+    navStack,
+    setNavStack,
+    currentUser,
+    setCurrentUser,
+    loginAttempts,
+    setLoginAttempts,
+    loginBlockedUntil,
+    setLoginBlockedUntil,
+    privacidadAceptada,
+    setPrivacidadAceptada,
+    syncStatus,
+    setSyncStatus,
+    showSyncReport,
+    setShowSyncReport,
+    syncReport,
+    setSyncReport,
+    alertMsg,
+    setAlertMsg,
+    confirmConfig,
+    setConfirmConfig,
+    promptConfig,
+    setPromptConfig,
+    promptValue,
+    setPromptValue,
+    aiConfig,
+    setAiConfig,
+    showAIConfig,
+    setShowAIConfig,
+    aiStatus,
+    setAiStatus,
+    companies,
+    setCompanies,
+    usersList,
+    setUsersList,
+    patientsList,
+    setPatientsList,
+    savedReports,
+    setSavedReports,
+    savedBills,
+    setSavedBills,
+    atencionesCerradas,
+    setAtencionesCerradas,
+    doctorSignature,
+    setDoctorSignature,
+    auditLog,
+    setAuditLog,
+    activeTab,
+    setActiveTab,
+    data,
+    setData,
+    dataType,
+    setDataType,
+    isGenerating,
+    setIsGenerating,
+    isGeneratingRestr,
+    setIsGeneratingRestr,
+    isGeneratingReco,
+    setIsGeneratingReco,
+    saveStatus,
+    setSaveStatus,
+    _hcDirty,
+    _setHcDirty,
+    _exitHcConfirm,
+    _setExitHcConfirm,
+    patientSuggestions,
+    setPatientSuggestions,
+    historyNotification,
+    setHistoryNotification,
+    showRestriccionesPanel,
+    setShowRestriccionesPanel,
+    showHistoryModal,
+    setShowHistoryModal,
+    ripsModalData,
+    setRipsModalData,
+    backupModalData,
+    setBackupModalData,
+    hcChoiceAgenda,
+    setHcChoiceAgenda,
+    historyRecords,
+    setHistoryRecords,
+    patientSearchTerm,
+    setPatientSearchTerm,
+    genPatSearch,
+    setGenPatSearch,
+    examSearch,
+    setExamSearch,
+    examList,
+    setExamList,
+    showExamSuggs,
+    setShowExamSuggs,
+    diagExamen,
+    setDiagExamen,
+    justExamen,
+    setJustExamen,
+    printPreview,
+    setPrintPreview,
+    selectedCompanyReport,
+    setSelectedCompanyReport,
+    reporteActiveTab,
+    setReporteActiveTab,
+    certSelected,
+    setCertSelected,
+    reportStartDate,
+    setReportStartDate,
+    reportEndDate,
+    setReportEndDate,
+    reportAIResult,
+    setReportAIResult,
+    isGeneratingReport,
+    setIsGeneratingReport,
+    showExportTable,
+    setShowExportTable,
+    precioPorPaciente,
+    setPrecioPorPaciente,
+    showDianPanel,
+    setShowDianPanel,
+    dianProvider,
+    setDianProvider,
+    dianApiKey,
+    setDianApiKey,
+    billData,
+    setBillData,
+    savedBillsList,
+    setSavedBillsList,
+    portafolioItems,
+    setPortafolioItems,
+    portafolioForm,
+    setPortafolioForm,
+    portafolioEditId,
+    setPortafolioEditId,
+    cotizaciones,
+    setCotizaciones,
+    cotizacionForm,
+    setCotizacionForm,
+    cotizacionView,
+    setCotizacionView,
+    cotizacionSelId,
+    setCotizacionSelId,
+    cajaMovimientos,
+    setCajaMovimientos,
+    cajaForm,
+    setCajaForm,
+    cajaTab,
+    setCajaTab,
+    cajaFiltroPeriodo,
+    setCajaFiltroPeriodo,
+    cajaFiltroDesde,
+    setCajaFiltroDesde,
+    cajaFiltroHasta,
+    setCajaFiltroHasta,
+    contabTab,
+    setContabTab,
+    contabPeriodo,
+    setContabPeriodo,
+    asistenciaFecha,
+    setAsistenciaFecha,
+    evolucionForm,
+    setEvolucionForm,
+    showEvolucionModal,
+    setShowEvolucionModal,
+    selectedPackage,
+    setSelectedPackage,
+    packageChecklist,
+    setPackageChecklist,
+    showPackages,
+    setShowPackages,
+    newComp,
+    setNewComp,
+    ipsPerfilForm,
+    setIpsPerfilForm,
+    verificationCode,
+    setVerificationCode,
+    verificationFound,
+    setVerificationFound,
+    activeUserMgmtTab,
+    setActiveUserMgmtTab,
+    pendingActivationPlan,
+    setPendingActivationPlan,
+    sbCloudData,
+    setSbCloudData,
+    sbLoading,
+    setSbLoading,
+    newUserForm,
+    setNewUserForm,
+    userEditId,
+    setUserEditId,
+    editForm,
+    setEditForm,
+    propForm,
+    setPropForm,
+    selSvc,
+    setSelSvc,
+    propModulo,
+    setPropModulo,
+    mensajes,
+    setMensajes,
+    showMensajePanel,
+    setShowMensajePanel,
+    showConsentModal,
+    setShowConsentModal,
+    twoFAStep,
+    setTwoFAStep,
+    twoFAToken,
+    setTwoFAToken,
+    twoFAError,
+    setTwoFAError,
+    habeasRequests,
+    setHabeasRequests,
+    showHabeasModal,
+    setShowHabeasModal,
+    habeasForm,
+    setHabeasForm,
+    showPortalPublico,
+    setShowPortalPublico,
+    arlTab,
+    setArlTab,
+    svePrograma,
+    setSvePrograma,
+    sveFiltroEmpresa,
+    setSveFiltroEmpresa,
+    sveAIAnalisis,
+    setSveAIAnalisis,
+    sveAICargando,
+    setSveAIAnalisisCargando,
+    sveAIFiltroEmpresa,
+    setSveAIFiltroEmpresa,
+    arlForm,
+    setArlForm,
+    arlGuardados,
+    setArlGuardados,
+    showNotifModal,
+    setShowNotifModal,
+    notifData,
+    setNotifData,
+    portalCodigo,
+    setPortalCodigo,
+    portalPaciente,
+    setPortalPaciente,
+    portalMultiple,
+    setPortalMultiple,
+    epiEmpresa,
+    setEpiEmpresa,
+    epiPeriodo,
+    setEpiPeriodo,
+    epiTab,
+    setEpiTab,
+    teleconsultas,
+    setTeleconsultas,
+    teleForm,
+    setTeleForm,
+    teleSalaActiva,
+    setTeleSalaActiva,
+    teleTab,
+    setTeleTab,
+    mensajeRespuesta,
+    setMensajeRespuesta,
+    agendados,
+    setAgendados,
+    showAgenda,
+    setShowAgenda,
+    agendaForm,
+    setAgendaForm,
+    agendaSuggs,
+    setAgendaSuggs,
+    agendaTab,
+    setAgendaTab,
+    showComposeMensaje,
+    setShowComposeMensaje,
+    composeMensaje,
+    setComposeMensaje,
+    inactivityWarning,
+    setInactivityWarning,
+    inactivityCountdown,
+    setInactivityCountdown,
+    companiesTab,
+    setCompaniesTab,
+    editingCompany,
+    setEditingCompany,
+    cajaMedicoPeriodo,
+    setCajaMedicoPeriodo,
+    porcentajeMedico,
+    setPorcentajeMedico,
+    medicoTurnoActivo,
+    setMedicoTurnoActivo,
+    orgsList,
+    setOrgsList,
+    activeOrgId,
+    setActiveOrgId,
+    superAdminTab,
+    setSuperAdminTab,
+    newOrgForm,
+    setNewOrgForm,
+    portalEmpresaCodigo,
+    setPortalEmpresaCodigo,
+    portalEmpresaEncontrada,
+    setPortalEmpresaEncontrada,
+    portalEmpresaPacientes,
+    setPortalEmpresaPacientes,
+    portalEmpresaTab,
+    setPortalEmpresaTab,
+    portalEmpresaBuscando,
+    setPortalEmpresaBuscando,
+    portalEmpresaFiltroDoc,
+    setPortalEmpresaFiltroDoc,
+    portalActivadoInfo,
+    setPortalActivadoInfo,
+    portalEmpresaAdmin,
+    setPortalEmpresaAdmin,
+    portalAdminTab,
+    setPortalAdminTab,
+    portalAdminLoginUser,
+    setPortalAdminLoginUser,
+    portalAdminLoginPass,
+    setPortalAdminLoginPass,
+    nuevoMedicoEmpForm,
+    setNuevoMedicoEmpForm,
+    sedeForm,
+    setSedeForm,
+    ipsCredForm,
+    setIpsCredForm,
+    ipsEditingEmpId,
+    setIpsEditingEmpId,
+    handleAceptarPrivacidad,
+    logAccess,
+    exportPatientTable,
+    fileInputRef,
+    fileInputSigRef,
+    csvInputRef,
+    _inactivityRef,
+    _warnRef,
+    _cajaSaveTimer,
+    showAlert,
+    showConfirm,
+    showPrompt,
+    sessionUser,
+    _initSess,
+    applyCloud,
+    handler,
+    doAutoBackup,
+    callAI,
+    generateAIAnalysis,
+    _tipoExamen,
+    _contextoTipo,
+    generateAIRestricciones,
+    lista,
+    generateAIRecomendaciones,
+    generateAIGeneral,
+    generateAIReport,
+    fmtDist,
+    handleChange,
+    handleManualCloudSave,
+    handleSaveAIConfig,
+    _loadScoped,
+    handleVerify2FA,
+    canViewPatient,
+    isHcOwner,
+    openPatient,
+    handleNewOccupHistory,
+    handleNewGeneralHistory,
+    _syncPatients,
+    _syncCompanies,
+    checkAlertasObligatorias,
+    handleSavePatient,
+    handleCloseHistory,
+    _tipoConsulta,
+    handleAiResumen,
+    handleEditHistory,
+    op,
+    handleCompanySelect,
+    handleDeletePatient,
+    handleSignatureUpload,
+    handleExportData,
+    handleImportData,
+    sigsRestored,
+    billsR,
+    repsR,
+    closedPats,
+    handleNameChange,
+    selectPatientSuggestion,
+    handleOpenHistoryModal,
+    applyRestriccionesChecklist,
+    applyRecomendacionesChecklist,
+    handlePrint,
+    _maybeExitHC,
+    _goToDirect,
+    goTo,
+    _goBackDirect,
+    goBack,
+    renderNavbar,
+    renderTabAdjuntos,
+    renderTabSolicitudExamenes,
+    renderTabIncapacidadGeneral,
+    renderEvolucionModal,
+    TabFormulaDerivacion,
+    ConsentimientoModal,
+    NotificacionModal,
+    LoginForm,
+    PortalPublicoTrabajador,
+    AgendaFieldF,
+    ...rest
+  } = props;
 
     const handleBuscar = () => {
-      if (!portalCodigo.trim()) {
-        showAlert("Ingrese su código de verificación.");
+      const q = portalCodigo.trim();
+      if (!q) {
+        showAlert("Ingrese su código de verificación o número de cédula.");
         return;
       }
-      const pac = patientsList.find(
-        (p) => p.codigoVerificacion === portalCodigo.trim().toUpperCase()
+      // 1️⃣ Buscar por código de verificación (cualquier formato: SISO-... o CV-...)
+      const qUp = q.toUpperCase();
+      let pac = patientsList.find(
+        (p) => p.codigoVerificacion && p.codigoVerificacion.toUpperCase() === qUp
       );
-      if (!pac) {
-        showAlert("❌ Código no encontrado. Verifique e intente de nuevo.");
-        setPortalPaciente(null);
+      if (pac) {
+        setPortalMultiple([]);
+        setPortalPaciente(pac);
         return;
       }
-      setPortalPaciente(pac);
+      // 2️⃣ Buscar por número de documento (cédula) — solo HCs cerradas
+      const qDoc = q.replace(/\s/g, "");
+      const byDoc = patientsList.filter(
+        (p) =>
+          p.docNumero &&
+          p.docNumero.replace(/\s/g, "") === qDoc &&
+          p.estadoHistoria === "Cerrada" &&
+          !p._archivado
+      );
+      if (byDoc.length === 1) {
+        setPortalMultiple([]);
+        setPortalPaciente(byDoc[0]);
+        return;
+      }
+      if (byDoc.length > 1) {
+        // Múltiples HCs para ese documento — mostrar selector
+        setPortalPaciente(null);
+        setPortalMultiple(byDoc);
+        return;
+      }
+      // 3️⃣ No encontrado
+      showAlert("❌ Código o cédula no encontrado.\nVerifique el dato e intente de nuevo.");
+      setPortalPaciente(null);
+      setPortalMultiple([]);
     };
 
     return (
@@ -107,7 +526,7 @@ export const PortalTrabajador = (props) => {
               </p>
             </div>
             <p className="text-sm font-black text-gray-800 mb-3">
-              Consulta con código de verificación
+              Consulta con código de verificación o número de cédula
             </p>
             <div className="flex gap-3">
               <input
@@ -115,8 +534,8 @@ export const PortalTrabajador = (props) => {
                 onChange={(e) => setPortalCodigo(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
                 className="flex-1 p-2.5 border-2 border-teal-200 rounded-xl text-sm font-mono font-black tracking-widest uppercase"
-                placeholder="Ej: SISO-2025-XXXX"
-                maxLength={30}
+                placeholder="Código (SISO-... / CV-...) o número de cédula"
+                maxLength={50}
               />
               <button
                 onClick={handleBuscar}
@@ -126,10 +545,44 @@ export const PortalTrabajador = (props) => {
               </button>
             </div>
             <p className="text-[10px] text-gray-400 mt-2">
-              El código de verificación le fue entregado por el médico al
-              finalizar su evaluación.
+              Ingrese el código de verificación entregado por el médico, <strong>o su número de cédula</strong> para ver todas sus evaluaciones.
             </p>
           </div>
+
+          {/* Selector múltiples HC por cédula */}
+          {portalMultiple.length > 1 && !portalPaciente && (
+            <div className="bg-white rounded-2xl shadow-sm border border-teal-200 overflow-hidden">
+              <div className="bg-teal-50 px-5 py-3 border-b border-teal-100">
+                <p className="text-sm font-black text-teal-800">
+                  📋 Se encontraron {portalMultiple.length} evaluaciones para esa cédula
+                </p>
+                <p className="text-[10px] text-teal-600 mt-0.5">Seleccione la que desea consultar:</p>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {portalMultiple.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => { setPortalPaciente(p); setPortalMultiple([]); }}
+                    className="w-full text-left px-5 py-3 hover:bg-teal-50 transition flex justify-between items-center"
+                  >
+                    <div>
+                      <p className="text-sm font-black text-gray-800">{p.tipoExamen || "Evaluación"} — {p.fechaExamen || "--"}</p>
+                      <p className="text-[10px] text-gray-500">{p.empresaNombre || "--"} · {p.cargo || "--"}</p>
+                    </div>
+                    <span className={`text-[10px] font-black px-2 py-1 rounded-full ${
+                      (p.conceptoAptitud || "").toLowerCase().includes("no apto")
+                        ? "bg-red-100 text-red-700"
+                        : (p.conceptoAptitud || "").toLowerCase().includes("condicion")
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-emerald-100 text-emerald-700"
+                    }`}>
+                      {p.conceptoAptitud || "Pendiente"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Resultado */}
           {portalPaciente && (
@@ -294,9 +747,6 @@ export const PortalTrabajador = (props) => {
       </div>
     );
 
-  // ══════════════════════════════════════════════════════════════════════════
-  // B-31: SVE - Sistema Vigilancia Epidemiológica - Res. 2346/2007 · Res. 1843/2025
-  // ══════════════════════════════════════════════════════════════════════════
 };
 
 export default PortalTrabajador;

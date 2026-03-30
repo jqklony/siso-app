@@ -1,19 +1,412 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, Fragment } from 'react';
-import { useAuthStore } from '../stores/authStore.js';
-import { useUIStore } from '../stores/uiStore.js';
-import { usePatientsStore } from '../stores/patientsStore.js';
-import { useCompaniesStore } from '../stores/companiesStore.js';
+import React from 'react';
 
+// ─── Propuestas Page Component ─────────────────────────────────────────────
+// Auto-extracted from App.jsx monolith
 export const Propuestas = (props) => {
-  const { currentUser, setCurrentUser, privacidadAceptada, setPrivacidadAceptada } = useAuthStore();
-  const { view, setView, navStack, setNavStack, navigate, goBack, alertMsg, setAlertMsg, activeTab, setActiveTab, dataType, setDataType, showAIConfig, setShowAIConfig, aiStatus, setAiStatus, syncStatus, setSyncStatus, confirmConfig, setConfirmConfig, promptConfig, setPromptConfig, promptValue, setPromptValue } = useUIStore();
-  const { patientsList, setPatientsList, patientSearchTerm, setSearchTerm, savedReports, setSavedReports, atencionesCerradas, setAtencionesCerradas, savedBills, setSavedBills } = usePatientsStore();
-  const { companies, setCompaniesList, usersList, setUsersList, doctorSignature, setDoctorSignature, aiConfig, setAiConfig } = useCompaniesStore();
-  // Props spread for backward compat
-  const { data, ...rest } = props;
-
-  // -------- EXTRACTED FROM MONOLITH: renderPropuestas --------
-  // This component was auto-extracted. Review and refactor as needed.
+  const {
+    view,
+    setView,
+    navStack,
+    setNavStack,
+    currentUser,
+    setCurrentUser,
+    loginAttempts,
+    setLoginAttempts,
+    loginBlockedUntil,
+    setLoginBlockedUntil,
+    privacidadAceptada,
+    setPrivacidadAceptada,
+    syncStatus,
+    setSyncStatus,
+    showSyncReport,
+    setShowSyncReport,
+    syncReport,
+    setSyncReport,
+    alertMsg,
+    setAlertMsg,
+    confirmConfig,
+    setConfirmConfig,
+    promptConfig,
+    setPromptConfig,
+    promptValue,
+    setPromptValue,
+    aiConfig,
+    setAiConfig,
+    showAIConfig,
+    setShowAIConfig,
+    aiStatus,
+    setAiStatus,
+    companies,
+    setCompanies,
+    usersList,
+    setUsersList,
+    patientsList,
+    setPatientsList,
+    savedReports,
+    setSavedReports,
+    savedBills,
+    setSavedBills,
+    atencionesCerradas,
+    setAtencionesCerradas,
+    doctorSignature,
+    setDoctorSignature,
+    auditLog,
+    setAuditLog,
+    activeTab,
+    setActiveTab,
+    data,
+    setData,
+    dataType,
+    setDataType,
+    isGenerating,
+    setIsGenerating,
+    isGeneratingRestr,
+    setIsGeneratingRestr,
+    isGeneratingReco,
+    setIsGeneratingReco,
+    saveStatus,
+    setSaveStatus,
+    _hcDirty,
+    _setHcDirty,
+    _exitHcConfirm,
+    _setExitHcConfirm,
+    patientSuggestions,
+    setPatientSuggestions,
+    historyNotification,
+    setHistoryNotification,
+    showRestriccionesPanel,
+    setShowRestriccionesPanel,
+    showHistoryModal,
+    setShowHistoryModal,
+    ripsModalData,
+    setRipsModalData,
+    backupModalData,
+    setBackupModalData,
+    hcChoiceAgenda,
+    setHcChoiceAgenda,
+    historyRecords,
+    setHistoryRecords,
+    patientSearchTerm,
+    setPatientSearchTerm,
+    genPatSearch,
+    setGenPatSearch,
+    examSearch,
+    setExamSearch,
+    examList,
+    setExamList,
+    showExamSuggs,
+    setShowExamSuggs,
+    diagExamen,
+    setDiagExamen,
+    justExamen,
+    setJustExamen,
+    printPreview,
+    setPrintPreview,
+    selectedCompanyReport,
+    setSelectedCompanyReport,
+    reporteActiveTab,
+    setReporteActiveTab,
+    certSelected,
+    setCertSelected,
+    reportStartDate,
+    setReportStartDate,
+    reportEndDate,
+    setReportEndDate,
+    reportAIResult,
+    setReportAIResult,
+    isGeneratingReport,
+    setIsGeneratingReport,
+    showExportTable,
+    setShowExportTable,
+    precioPorPaciente,
+    setPrecioPorPaciente,
+    showDianPanel,
+    setShowDianPanel,
+    dianProvider,
+    setDianProvider,
+    dianApiKey,
+    setDianApiKey,
+    billData,
+    setBillData,
+    savedBillsList,
+    setSavedBillsList,
+    portafolioItems,
+    setPortafolioItems,
+    portafolioForm,
+    setPortafolioForm,
+    portafolioEditId,
+    setPortafolioEditId,
+    cotizaciones,
+    setCotizaciones,
+    cotizacionForm,
+    setCotizacionForm,
+    cotizacionView,
+    setCotizacionView,
+    cotizacionSelId,
+    setCotizacionSelId,
+    cajaMovimientos,
+    setCajaMovimientos,
+    cajaForm,
+    setCajaForm,
+    cajaTab,
+    setCajaTab,
+    cajaFiltroPeriodo,
+    setCajaFiltroPeriodo,
+    cajaFiltroDesde,
+    setCajaFiltroDesde,
+    cajaFiltroHasta,
+    setCajaFiltroHasta,
+    contabTab,
+    setContabTab,
+    contabPeriodo,
+    setContabPeriodo,
+    asistenciaFecha,
+    setAsistenciaFecha,
+    evolucionForm,
+    setEvolucionForm,
+    showEvolucionModal,
+    setShowEvolucionModal,
+    selectedPackage,
+    setSelectedPackage,
+    packageChecklist,
+    setPackageChecklist,
+    showPackages,
+    setShowPackages,
+    newComp,
+    setNewComp,
+    ipsPerfilForm,
+    setIpsPerfilForm,
+    verificationCode,
+    setVerificationCode,
+    verificationFound,
+    setVerificationFound,
+    activeUserMgmtTab,
+    setActiveUserMgmtTab,
+    pendingActivationPlan,
+    setPendingActivationPlan,
+    sbCloudData,
+    setSbCloudData,
+    sbLoading,
+    setSbLoading,
+    newUserForm,
+    setNewUserForm,
+    userEditId,
+    setUserEditId,
+    editForm,
+    setEditForm,
+    propForm,
+    setPropForm,
+    selSvc,
+    setSelSvc,
+    propModulo,
+    setPropModulo,
+    mensajes,
+    setMensajes,
+    showMensajePanel,
+    setShowMensajePanel,
+    showConsentModal,
+    setShowConsentModal,
+    twoFAStep,
+    setTwoFAStep,
+    twoFAToken,
+    setTwoFAToken,
+    twoFAError,
+    setTwoFAError,
+    habeasRequests,
+    setHabeasRequests,
+    showHabeasModal,
+    setShowHabeasModal,
+    habeasForm,
+    setHabeasForm,
+    showPortalPublico,
+    setShowPortalPublico,
+    arlTab,
+    setArlTab,
+    svePrograma,
+    setSvePrograma,
+    sveFiltroEmpresa,
+    setSveFiltroEmpresa,
+    sveAIAnalisis,
+    setSveAIAnalisis,
+    sveAICargando,
+    setSveAIAnalisisCargando,
+    sveAIFiltroEmpresa,
+    setSveAIFiltroEmpresa,
+    arlForm,
+    setArlForm,
+    arlGuardados,
+    setArlGuardados,
+    showNotifModal,
+    setShowNotifModal,
+    notifData,
+    setNotifData,
+    portalCodigo,
+    setPortalCodigo,
+    portalPaciente,
+    setPortalPaciente,
+    portalMultiple,
+    setPortalMultiple,
+    epiEmpresa,
+    setEpiEmpresa,
+    epiPeriodo,
+    setEpiPeriodo,
+    epiTab,
+    setEpiTab,
+    teleconsultas,
+    setTeleconsultas,
+    teleForm,
+    setTeleForm,
+    teleSalaActiva,
+    setTeleSalaActiva,
+    teleTab,
+    setTeleTab,
+    mensajeRespuesta,
+    setMensajeRespuesta,
+    agendados,
+    setAgendados,
+    showAgenda,
+    setShowAgenda,
+    agendaForm,
+    setAgendaForm,
+    agendaSuggs,
+    setAgendaSuggs,
+    agendaTab,
+    setAgendaTab,
+    showComposeMensaje,
+    setShowComposeMensaje,
+    composeMensaje,
+    setComposeMensaje,
+    inactivityWarning,
+    setInactivityWarning,
+    inactivityCountdown,
+    setInactivityCountdown,
+    companiesTab,
+    setCompaniesTab,
+    editingCompany,
+    setEditingCompany,
+    cajaMedicoPeriodo,
+    setCajaMedicoPeriodo,
+    porcentajeMedico,
+    setPorcentajeMedico,
+    medicoTurnoActivo,
+    setMedicoTurnoActivo,
+    orgsList,
+    setOrgsList,
+    activeOrgId,
+    setActiveOrgId,
+    superAdminTab,
+    setSuperAdminTab,
+    newOrgForm,
+    setNewOrgForm,
+    portalEmpresaCodigo,
+    setPortalEmpresaCodigo,
+    portalEmpresaEncontrada,
+    setPortalEmpresaEncontrada,
+    portalEmpresaPacientes,
+    setPortalEmpresaPacientes,
+    portalEmpresaTab,
+    setPortalEmpresaTab,
+    portalEmpresaBuscando,
+    setPortalEmpresaBuscando,
+    portalEmpresaFiltroDoc,
+    setPortalEmpresaFiltroDoc,
+    portalActivadoInfo,
+    setPortalActivadoInfo,
+    portalEmpresaAdmin,
+    setPortalEmpresaAdmin,
+    portalAdminTab,
+    setPortalAdminTab,
+    portalAdminLoginUser,
+    setPortalAdminLoginUser,
+    portalAdminLoginPass,
+    setPortalAdminLoginPass,
+    nuevoMedicoEmpForm,
+    setNuevoMedicoEmpForm,
+    sedeForm,
+    setSedeForm,
+    ipsCredForm,
+    setIpsCredForm,
+    ipsEditingEmpId,
+    setIpsEditingEmpId,
+    handleAceptarPrivacidad,
+    logAccess,
+    exportPatientTable,
+    fileInputRef,
+    fileInputSigRef,
+    csvInputRef,
+    _inactivityRef,
+    _warnRef,
+    _cajaSaveTimer,
+    showAlert,
+    showConfirm,
+    showPrompt,
+    sessionUser,
+    _initSess,
+    applyCloud,
+    handler,
+    doAutoBackup,
+    callAI,
+    generateAIAnalysis,
+    _tipoExamen,
+    _contextoTipo,
+    generateAIRestricciones,
+    lista,
+    generateAIRecomendaciones,
+    generateAIGeneral,
+    generateAIReport,
+    fmtDist,
+    handleChange,
+    handleManualCloudSave,
+    handleSaveAIConfig,
+    _loadScoped,
+    handleVerify2FA,
+    canViewPatient,
+    isHcOwner,
+    openPatient,
+    handleNewOccupHistory,
+    handleNewGeneralHistory,
+    _syncPatients,
+    _syncCompanies,
+    checkAlertasObligatorias,
+    handleSavePatient,
+    handleCloseHistory,
+    _tipoConsulta,
+    handleAiResumen,
+    handleEditHistory,
+    op,
+    handleCompanySelect,
+    handleDeletePatient,
+    handleSignatureUpload,
+    handleExportData,
+    handleImportData,
+    sigsRestored,
+    billsR,
+    repsR,
+    closedPats,
+    handleNameChange,
+    selectPatientSuggestion,
+    handleOpenHistoryModal,
+    applyRestriccionesChecklist,
+    applyRecomendacionesChecklist,
+    handlePrint,
+    _maybeExitHC,
+    _goToDirect,
+    goTo,
+    _goBackDirect,
+    goBack,
+    renderNavbar,
+    renderTabAdjuntos,
+    renderTabSolicitudExamenes,
+    renderTabIncapacidadGeneral,
+    renderEvolucionModal,
+    TabFormulaDerivacion,
+    ConsentimientoModal,
+    NotificacionModal,
+    LoginForm,
+    PortalPublicoTrabajador,
+    AgendaFieldF,
+    ...rest
+  } = props;
 
     if (!_canUse("propuestas", currentUser))
       return (
@@ -168,8 +561,8 @@ export const Propuestas = (props) => {
     return (
       <div className="min-h-screen bg-gray-50 font-sans p-8 print:bg-white print:p-0">
         <div className="max-w-4xl mx-auto">
-          {/* ── TAB SELECTOR: Propuesta Económica ↔ Cotización Rápida ── */}
-          <div className="flex gap-2 mb-4 no-print border-b border-gray-200 pb-3">
+          {/* ── TAB SELECTOR: Propuesta Económica ↔ Cotización Rápida ↔ Historial ── */}
+          <div className="flex gap-2 mb-4 no-print border-b border-gray-200 pb-3 flex-wrap">
             <button
               onClick={() => setPropModulo("propuesta")}
               className={`px-5 py-2 rounded-t-xl text-sm font-black transition-all ${
@@ -190,8 +583,106 @@ export const Propuestas = (props) => {
             >
               🧾 Cotización Rápida
             </button>
+            <button
+              onClick={() => setPropModulo("historial")}
+              className={`px-5 py-2 rounded-t-xl text-sm font-black transition-all ${
+                propModulo === "historial"
+                  ? "bg-amber-600 text-white shadow"
+                  : "bg-gray-100 text-gray-600 hover:bg-amber-50 hover:text-amber-700"
+              }`}
+            >
+              🗂 Historial ({savedReports.filter(r => r._tipo === "propuesta" || r.servicios).length})
+            </button>
           </div>
           {propModulo === "cotizacion" && renderCotizacionesInline()}
+          {/* ── HISTORIAL DE PROPUESTAS GUARDADAS ── */}
+          {propModulo === "historial" && (() => {
+            const propsSaved = savedReports.filter(r => r._tipo === "propuesta" || r.servicios);
+            return (
+              <div className="bg-white shadow rounded-2xl p-6">
+                <div className="flex justify-between items-center mb-5">
+                  <h2 className="text-lg font-black text-amber-800 flex items-center gap-2">
+                    🗂 Propuestas Guardadas
+                    <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-0.5 rounded-full">{propsSaved.length}</span>
+                  </h2>
+                  <button onClick={() => goBack()} className="text-gray-500 font-bold text-sm flex items-center gap-1">
+                    <LogOut className="rotate-180 w-4 h-4" /> Volver
+                  </button>
+                </div>
+                {propsSaved.length === 0 ? (
+                  <div className="text-center py-12 text-gray-400">
+                    <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm font-medium">No hay propuestas guardadas aún.</p>
+                    <p className="text-xs mt-1">Cree una propuesta y presione Guardar.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-amber-50 text-amber-800 text-xs font-black">
+                          <th className="px-3 py-2 text-left rounded-tl-lg">N.°</th>
+                          <th className="px-3 py-2 text-left">Empresa</th>
+                          <th className="px-3 py-2 text-left">NIT</th>
+                          <th className="px-3 py-2 text-left">Fecha</th>
+                          <th className="px-3 py-2 text-right">Total</th>
+                          <th className="px-3 py-2 text-center">Vigencia</th>
+                          <th className="px-3 py-2 text-center rounded-tr-lg">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...propsSaved].reverse().map((prop, idx) => {
+                          const totalProp = (prop.servicios || []).reduce((s, x) => s + (x.precio || 0) * (x.cantidad || 1), 0);
+                          const fechaProp = prop.fecha || prop.savedAt?.split("T")[0] || "—";
+                          const diasVig = parseInt(prop.validez || "30", 10);
+                          const fechaVenc = prop.fecha ? new Date(new Date(prop.fecha).getTime() + diasVig * 86400000) : null;
+                          const vencida = fechaVenc && fechaVenc < new Date();
+                          return (
+                            <tr key={prop.id || idx} className="border-b border-gray-100 hover:bg-amber-50 transition-colors">
+                              <td className="px-3 py-2 font-black text-teal-700">#{prop.numero || "—"}</td>
+                              <td className="px-3 py-2 font-medium text-gray-800 max-w-[160px] truncate">{prop.empresa || "—"}</td>
+                              <td className="px-3 py-2 text-gray-500 text-xs">{prop.nit || "—"}</td>
+                              <td className="px-3 py-2 text-gray-500 text-xs">{fechaProp}</td>
+                              <td className="px-3 py-2 text-right font-black text-emerald-700">
+                                ${(totalProp).toLocaleString("es-CO")}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${vencida ? "bg-red-100 text-red-600" : "bg-green-100 text-green-700"}`}>
+                                  {vencida ? "Vencida" : "Vigente"}
+                                </span>
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                <div className="flex gap-1 justify-center">
+                                  <button
+                                    onClick={() => { setPropForm(prop); setPropModulo("propuesta"); }}
+                                    className="bg-teal-100 text-teal-700 px-2 py-1 rounded text-xs font-bold hover:bg-teal-200"
+                                    title="Abrir y editar"
+                                  >
+                                    Abrir
+                                  </button>
+                                  <button
+                                    onClick={() => showConfirm("¿Eliminar esta propuesta del historial?", () => {
+                                      const upd = savedReports.filter(r => r.id !== prop.id);
+                                      setSavedReports(upd);
+                                      _sync("siso_saved_reports", JSON.stringify(upd));
+                                      _sbSet("siso_saved_reports", upd);
+                                    })}
+                                    className="bg-red-100 text-red-600 px-2 py-1 rounded text-xs font-bold hover:bg-red-200"
+                                    title="Eliminar"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
           <div
             style={{ display: propModulo === "propuesta" ? "block" : "none" }}
           >
@@ -221,6 +712,7 @@ export const Propuestas = (props) => {
                         id: Date.now(),
                         savedAt: new Date().toISOString(),
                         numero: propForm.numero || nextPropNum,
+                        _tipo: "propuesta",
                       };
                       if (!nb.empresa && !nb.nit) {
                         showAlert("Complete al menos empresa o NIT.");
@@ -950,7 +1442,7 @@ export const Propuestas = (props) => {
         </div>
       </div>
     );
-  // ─── RENDER: TAB SOLICITUD EXÁMENES ─────────────────────────────────────
+
 };
 
 export default Propuestas;
