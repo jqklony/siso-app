@@ -3851,5 +3851,6 @@ Esta historia clínica debe conservarse mínimo 20 años.
     _goBackDirect,
     goBack,
     handleLogin,
+        saveCaja: saveCajaDebounced,
   };
 }
