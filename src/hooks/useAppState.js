@@ -3529,6 +3529,8 @@ Esta historia clínica debe conservarse mínimo 20 años.
     setHistoryNotification,
     showRestriccionesPanel,
     setShowRestriccionesPanel,
+        showRecomendacionesPanel,
+    setShowRecomendacionesPanel,
     showHistoryModal,
     setShowHistoryModal,
     ripsModalData,
