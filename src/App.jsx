@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  AlertCircle, AlertTriangle, Cloud, FileCheck, HardDrive,
+  AlertCircle, AlertTriangle, CheckCircle2, Cloud, FileCheck, HardDrive, X,
   Lock, Printer, RefreshCw, Save
 } from "lucide-react";
 // ─── AppComponents: all utilities + sub-components ──────────────────────────
@@ -451,7 +451,7 @@ export default function App() {
     goTo,
     _goBackDirect,
     goBack,
-    handleLogin,
+    handleLogin,     saveCaja,
   } = state;
 
   // Render helpers (receive state via closure)
@@ -463,6 +463,25 @@ export default function App() {
     renderEvolucionModal,
     renderMensajesOverlay,
   } = createRenderHelpers(state);
+
+    // Abrir HC desde agenda: resetear datos y navegar a historia
+  const abrirHCDesdeAgenda = (agItem, tipo) => {
+    setHcChoiceAgenda(null);
+    if (tipo === 'ocupacional') {
+      handleNewOccupHistory();
+    } else {
+      handleNewGeneralHistory();
+    }
+    // Pre-rellenar nombre y documento si vienen del item de agenda
+    if (agItem) {
+      setData(prev => ({
+        ...prev,
+        nombres: agItem.nombre || prev.nombres,
+        docNumero: agItem.docNumero || prev.docNumero,
+        _agendaId: agItem.id,
+      }));
+    }
+  };
 
   const renderCurrentView = () => {
 
